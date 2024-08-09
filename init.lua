@@ -180,7 +180,7 @@ end, {})
 vim.api.nvim_create_autocmd("User", {
   pattern = "LuasnipSnippetsAdded",
   callback = function()
-    print("Snippets loaded for: " .. vim.bo.filetype)
+    --print("Snippets loaded for: " .. vim.bo.filetype)
   end,
 })
 
@@ -408,10 +408,24 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 function RefreshDiagnostics()
   if not is_sv_file() then return end
   local bufnr = vim.api.nvim_get_current_buf()
-  vim.diagnostic.reset(nil, bufnr)
-  vim.diagnostic.show(nil, bufnr)
-  if verilator_diagnostics then
+  
+  -- Instead of resetting, let's get the current diagnostics
+  local current_diagnostics = vim.diagnostic.get(bufnr)
+  
+  -- If there are no current diagnostics, run the verilator diagnostics
+  if #current_diagnostics == 0 and verilator_diagnostics then
     verilator_diagnostics()
+  end
+  
+  -- Get the updated diagnostics (including any from verilator)
+  current_diagnostics = vim.diagnostic.get(bufnr)
+  
+  -- Display the current diagnostics
+  vim.diagnostic.show(nil, bufnr)
+  
+  -- Optionally, you can print or display the diagnostics in some way
+  for _, diagnostic in ipairs(current_diagnostics) do
+    print(string.format("Line %d: %s", diagnostic.lnum + 1, diagnostic.message))
   end
 end
 
