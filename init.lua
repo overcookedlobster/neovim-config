@@ -62,7 +62,11 @@ require('packer').startup(function(use)
   use 'hrsh7th/cmp-nvim-lsp'
   use { 'jose-elias-alvarez/null-ls.nvim', requires = { 'nvim-lua/plenary.nvim' } }
   use { "folke/trouble.nvim", requires = "kyazdani42/nvim-web-devicons" }
-
+    use({
+        "iamcco/markdown-preview.nvim",
+        run = function() vim.fn["mkdp#util#install"]() end,
+    })
+    use("preservim/vim-markdown")
   if packer_bootstrap then
     require('packer').sync()
   end
@@ -247,7 +251,35 @@ _G.open_cheatsheet = function()
   local cheatsheet_path = string.format("~/.config/nvim/cheatsheets/%s_cheatsheet.md", filetype)
   
   if vim.fn.filereadable(vim.fn.expand(cheatsheet_path)) == 1 then
-    vim.cmd(string.format("vsplit %s", cheatsheet_path))
+    -- Open the cheatsheet in a new buffer
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
+    vim.api.nvim_buf_set_option(buf, 'filetype', 'markdown')
+    
+    -- Read the cheatsheet content into the buffer
+    local content = vim.fn.readfile(vim.fn.expand(cheatsheet_path))
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, content)
+    
+    -- Open the buffer in a new window
+    vim.api.nvim_command('vsplit')
+    vim.api.nvim_win_set_buf(0, buf)
+    
+    -- Set some options for better viewing
+    vim.api.nvim_win_set_option(0, 'wrap', false)
+    vim.api.nvim_win_set_option(0, 'conceallevel', 2)
+    vim.api.nvim_win_set_option(0, 'concealcursor', 'nc')
+    
+    -- Open markdown preview
+    vim.cmd('MarkdownPreview')
+    
+    -- Set up an autocommand to close the buffer when leaving the window
+    vim.cmd([[
+      augroup close_cheatsheet
+        autocmd!
+        autocmd WinLeave <buffer> bdelete!
+      augroup END
+    ]])
   else
     print(string.format("No cheatsheet found for filetype: %s", filetype))
   end
@@ -255,6 +287,18 @@ end
 
 -- Set up a keymap to open the cheatsheet
 vim.api.nvim_set_keymap("n", "<leader>qq", ":lua open_cheatsheet()<CR>", {noremap = true, silent = true})
+
+-- Markdown-specific settings
+vim.g.vim_markdown_folding_disabled = 1
+vim.g.vim_markdown_conceal = 2
+vim.g.vim_markdown_conceal_code_blocks = 0
+vim.g.vim_markdown_math = 1
+vim.g.vim_markdown_frontmatter = 1
+vim.g.vim_markdown_strikethrough = 1
+
+-- Markdown Preview settings
+vim.g.mkdp_auto_close = 1
+vim.g.mkdp_refresh_slow = 1
 
 -- Use `d` (delimiter) for targets.vim block text objects
 vim.cmd[[
