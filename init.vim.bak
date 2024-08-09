@@ -1,0 +1,105 @@
+" Plugins will be downloaded under the specified directory.
+call plug#begin(has('nvim') ? stdpath('data') . '/plugged' : '~/.vim/plugged')
+"lua require('plugins/telescope')
+:set ma
+let g:mapleader = " "
+let g:os_current = substitute(system('uname'), '\n', '', '')
+" Declare the list of plugins.
+Plug 'InES-HPMM/zhaw-snippets'
+Plug 'tpope/vim-sensible'
+Plug 'junegunn/seoul256.vim'
+Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
+" follow latest release and install jsregexp.
+Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'} " Replace <CurrentMajor> by the latest released major (first number of latest release)
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.4' }
+Plug 'nvim-telescope/telescope-file-browser.nvim'
+" or                                , { 'branch': '0.1.x' }
+Plug 'crispgm/telescope-heading.nvim'
+Plug 'jakemason/ouroboros'
+Plug 'morhetz/gruvbox'
+Plug 'luk400/vim-jukit' 
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'ibhagwan/fzf-lua', {'branch': 'main'}
+" optional for icon support
+Plug 'nvim-tree/nvim-web-devicons'
+" List ends here. Plugins become visible to Vim after this call.
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-nvim-lsp'
+call plug#end()
+" Expand or jump in insert mode
+imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>' 
+set tabstop=4
+set shiftwidth=4
+
+" Jump forward through tabstops in visual mode
+smap <silent><expr> <Tab> luasnip#jumpable(1) ? '<Plug>luasnip-jump-next' : '<Tab>'
+" Jump backward through snippet tabstops with Shift-Tab (for example)
+imap <silent><expr> <S-Tab> luasnip#jumpable(-1) ? '<Plug>luasnip-jump-prev' : '<S-Tab>'
+smap <silent><expr> <S-Tab> luasnip#jumpable(-1) ? '<Plug>luasnip-jump-prev' : '<S-Tab>'
+" Load snippets from ~/.config/nvim/LuaSnip/
+lua require("luasnip.loaders.from_lua").load({paths = "~/.config/nvim/LuaSnip/"})
+"":lua require("luasnip.loaders").edit_snippet_files()
+"":lua require("telescope").load_extension("luasnip")
+"lua require('lua.plugins.luasnip')
+" Find files using Telescope command-line sugar.
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+" Telescope keybindings
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader>fr <cmd>Telescope oldfiles<cr>
+nnoremap <leader>fc <cmd>Telescope current_buffer_fuzzy_find<cr>
+nnoremap <leader>fm <cmd>Telescope marks<cr>
+nnoremap <leader>fk <cmd>Telescope keymaps<cr>
+nnoremap <leader>fs <cmd>Telescope git_status<cr>
+nnoremap <leader>fp <cmd>Telescope file_browser<cr>
+:lua require('telescope').load_extension('heading')
+:lua require('plugins/packer')
+:set number
+
+let g:gruvbox_contrast_light = 'soft'
+let g:gruvbox_termcolors = '256'
+colorscheme gruvbox
+
+set expandtab       " Use spaces instead of tabs
+set smartindent     " Enable smart indent
+set autoindent      " Enable auto indent
+set wrap            " Wrap lines
+set incsearch       " Show search results as you type
+set ignorecase      " Ignore case when searching
+set smartcase       " Don't ignore case if search pattern has uppercase
+set clipboard=unnamedplus  " Use system clipboard
+set cursorline      " Highlight the current line
+set mouse=a         " Enable mouse support
+
+" Telescope setup
+lua << EOF
+require('telescope').setup{
+  defaults = {
+    file_ignore_patterns = {"node_modules"},
+    layout_strategy = 'vertical',
+    layout_config = { height = 0.95, width = 0.95 },
+  },
+  pickers = {
+    find_files = {
+      theme = "dropdown",
+    }
+  },
+  extensions = {
+    file_browser = {
+      theme = "ivy",
+      -- disables netrw and use telescope-file-browser in its place
+      hijack_netrw = true,
+    },
+  },
+}
+-- Load file browser extension
+require("telescope").load_extension "file_browser"
+EOF
