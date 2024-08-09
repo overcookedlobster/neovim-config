@@ -46,7 +46,6 @@ require('packer').startup(function(use)
   use 'junegunn/seoul256.vim'
   use {'xuhdev/vim-latex-live-preview', ft = 'tex'}
   use {'L3MON4D3/LuaSnip', tag = 'v2.*', run = 'make install_jsregexp'}
---use 'L3MON4D3/LuaSnip'
   use 'nvim-lua/plenary.nvim'
   use {'nvim-telescope/telescope.nvim', tag = '0.1.4'}
   use 'nvim-telescope/telescope-file-browser.nvim'
@@ -62,7 +61,7 @@ require('packer').startup(function(use)
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-nvim-lsp'
   use { 'jose-elias-alvarez/null-ls.nvim', requires = { 'nvim-lua/plenary.nvim' } }
-    use { "folke/trouble.nvim", requires = "kyazdani42/nvim-web-devicons" }
+  use { "folke/trouble.nvim", requires = "kyazdani42/nvim-web-devicons" }
 
   if packer_bootstrap then
     require('packer').sync()
@@ -128,7 +127,6 @@ if luasnip._snippets then
   end
 end
 
-
 vim.api.nvim_create_user_command("LuaSnipDebug", function()
   print("Debugging LuaSnip configuration:")
   local ls = require("luasnip")
@@ -178,12 +176,14 @@ vim.api.nvim_create_user_command("LuaSnipDebug", function()
   print("Filetype:", vim.bo.filetype)
   print("File path:", vim.fn.expand("%:p"))
 end, {})
+
 vim.api.nvim_create_autocmd("User", {
   pattern = "LuasnipSnippetsAdded",
   callback = function()
     print("Snippets loaded for: " .. vim.bo.filetype)
   end,
 })
+
 -- Telescope configuration
 local telescope_status_ok, telescope = pcall(require, 'telescope')
 if telescope_status_ok then
@@ -281,16 +281,9 @@ local function setup_keymaps()
 end
 
 setup_keymaps()
+
 local function load_snippets()
   require("luasnip.loaders.from_lua").load({paths = "~/.config/nvim/LuaSnip/sv/"})
-end
-
-local function setup_keymaps()
-  local opts = {noremap = true, silent = true}
-  vim.api.nvim_set_keymap("i", "<C-k>", "<Plug>luasnip-expand-or-jump", opts)
-  vim.api.nvim_set_keymap("s", "<C-k>", "<Plug>luasnip-expand-or-jump", opts)
-  vim.api.nvim_set_keymap("i", "<C-j>", "<Plug>luasnip-jump-prev", opts)
-  vim.api.nvim_set_keymap("s", "<C-j>", "<Plug>luasnip-jump-prev", opts)
 end
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -301,7 +294,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end
 })
 
-
 -- for sv linting
 local null_ls = require("null-ls")
 
@@ -311,7 +303,7 @@ null_ls.setup({
       extra_args = { "--lint-only", "-Wall" },
     }),
   },
-    on_attach = function(client, bufnr)
+  on_attach = function(client, bufnr)
     -- Enable diagnostics in normal mode
     vim.api.nvim_create_autocmd("BufEnter", {
       buffer = bufnr,
@@ -321,46 +313,7 @@ null_ls.setup({
     })
   end,
 })
-local h = require("null-ls.helpers")
-local methods = require("null-ls.methods")
 
---local DIAGNOSTICS = methods.internal.DIAGNOSTICS
-
---local verilator = h.make_builtin({
---  name = "verilator",
---  method = DIAGNOSTICS,
---  filetypes = { "verilog", "systemverilog" },
---  generator_opts = {
---    command = "verilator",
---    args = { "--lint-only", "-Wall", "$FILENAME" },
---    to_stdin = false,
---    from_stderr = true,
---    format = "line",
---    on_output = h.diagnostics.from_patterns({
---      {
---        pattern = [[:(%d+):(%d+):%s+(%w+):%s+(.*)$]],
---        groups = { "row", "col", "severity", "message" },
---      },
---    }),
---  },
---  factory = h.generator_factory,
---})
---
---null_ls.register(verilator)
---
---vim.cmd [[
---  augroup filetypedetect
---    au BufNewFile,BufRead *.sv,*.svh setfiletype systemverilog
---  augroup END
---]]
---
---vim.diagnostic.config({
---  virtual_text = true,
---  signs = true,
---  underline = true,
---  update_in_insert = false,
---  severity_sort = false,
---})
 require("trouble").setup {
   -- your configuration comes here
   -- or leave it empty to use the default settings
@@ -370,13 +323,6 @@ require("trouble").setup {
 vim.api.nvim_set_keymap("n", "<leader>xx", "<cmd>Trouble<cr>",
   {silent = true, noremap = true}
 )
-
---vim.api.nvim_create_autocmd({"InsertLeave"}, {
---  callback = function()
---    vim.diagnostic.show()
---    vim.diagnostic.setloclist()
---  end,
---})
 
 -- Change diagnostic signs
 vim.fn.sign_define("DiagnosticSignError", {text = "✘", texthl = "DiagnosticSignError"})
@@ -392,20 +338,6 @@ vim.cmd [[
   highlight DiagnosticHint guifg=#00ccff gui=bold
 ]]
 
---vim.diagnostic.config({
---  virtual_text = true,
---  signs = true,
---  underline = true,
---  update_in_insert = false,
---  severity_sort = true,
---})
-
-
---vim.api.nvim_create_autocmd({"BufReadPost"}, {
---  callback = function()
---    vim.diagnostic.show()
---  end,
---})
 local lspconfig = require('lspconfig')
 lspconfig.svls.setup{
   on_attach = function(client, bufnr)
@@ -416,14 +348,13 @@ lspconfig.svls.setup{
     local opts = { noremap=true, silent=true }
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+ vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-     vim.api.nvim_create_autocmd({"CursorHold", "CursorHoldI", "InsertLeave", "BufWritePost"}, {
+     vim.api.nvim_create_autocmd({"CursorHold", "CursorHoldI", "BufWritePost"}, {
       buffer = bufnr,
       callback = function()
-        vim.lsp.diagnostic.show(nil, bufnr)
-        vim.lsp.buf.document_highlight()
+        vim.diagnostic.show(nil, bufnr)
       end,
     })
   end,
@@ -431,52 +362,15 @@ lspconfig.svls.setup{
     debounce_text_changes = 150,
   }
 }
---vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
---  vim.lsp.diagnostic.on_publish_diagnostics, {
---    update_in_insert = true,
---    virtual_text = {
---      prefix = '●', -- Could be '■', '▎', 'x'
---      spacing = 4,
---    },
---    signs = true,
---    underline = true,
---  }
---)
 
--- if wants both verilator and lsp
--- local function verilator_diagnostics()
---  local bufnr = vim.api.nvim_get_current_buf()
---  local filename = vim.api.nvim_buf_get_name(bufnr)
---  local cmd = string.format("verilator --lint-only -Wall %s 2>&1", filename)
---  local output = vim.fn.system(cmd)
---  local diagnostics = {}
---  for line in output:gmatch("[^\r\n]+") do
---    local lnum, col, type, msg = line:match("(%d+):(%d+):%s*(%w+):%s*(.*)")
---    if lnum and col and type and msg then
---      table.insert(diagnostics, {
---        lnum = tonumber(lnum) - 1,
---        col = tonumber(col) - 1,
---        severity = type == "Error" and vim.diagnostic.severity.ERROR or vim.diagnostic.severity.WARN,
---        message = msg,
---        source = "Verilator"
---      })
---    end
---  end
---  vim.diagnostic.set(vim.api.nvim_create_namespace("verilator"), bufnr, diagnostics)
---end
---
---vim.api.nvim_create_autocmd({"BufWritePost", "TextChanged", "InsertLeave"}, {
---  pattern = {"*.sv", "*.v"},
---  callback = verilator_diagnostics
---})
-function RefreshDiagnostics()
-  vim.lsp.diagnostic.clear(0)
-  vim.lsp.buf.document_highlight()
-  vim.diagnostic.show()
+-- Function to check if the current buffer is a SystemVerilog file
+local function is_sv_file()
+  local ft = vim.bo.filetype
+  return ft == 'systemverilog' or ft == 'verilog'
 end
 
-vim.api.nvim_set_keymap('n', '<leader>r', '<cmd>lua RefreshDiagnostics()<CR>', {noremap = true, silent = true})
 local function verilator_diagnostics()
+  if not is_sv_file() then return end
   local bufnr = vim.api.nvim_get_current_buf()
   local filename = vim.api.nvim_buf_get_name(bufnr)
   local cmd = string.format("verilator --lint-only -Wall %s 2>&1", filename)
@@ -501,9 +395,9 @@ end
 
 vim.api.nvim_create_autocmd("InsertLeave", {
   callback = function()
+    if not is_sv_file() then return end
     local bufnr = vim.api.nvim_get_current_buf()
     vim.diagnostic.reset(nil, bufnr)
-    vim.lsp.buf.document_highlight()
     vim.diagnostic.show(nil, bufnr)
     if verilator_diagnostics then
       verilator_diagnostics()
@@ -512,9 +406,9 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 })
 
 function RefreshDiagnostics()
+  if not is_sv_file() then return end
   local bufnr = vim.api.nvim_get_current_buf()
   vim.diagnostic.reset(nil, bufnr)
-  vim.lsp.buf.document_highlight()
   vim.diagnostic.show(nil, bufnr)
   if verilator_diagnostics then
     verilator_diagnostics()
@@ -523,3 +417,30 @@ end
 
 vim.api.nvim_set_keymap('n', '<leader>r', '<cmd>lua RefreshDiagnostics()<CR>', {noremap = true, silent = true})
 vim.api.nvim_create_user_command('RefreshDiagnostics', RefreshDiagnostics, {})
+
+-- Diagnostic configuration
+vim.diagnostic.config({
+  virtual_text = true,
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+})
+
+-- Set up autocommand to ensure diagnostics are shown on file open
+vim.api.nvim_create_autocmd({"BufReadPost"}, {
+  callback = function()
+    if is_sv_file() then
+      vim.diagnostic.show()
+    end
+  end,
+})
+
+-- Optional: Set up autocmd for BufEnter to refresh diagnostics
+vim.api.nvim_create_autocmd({"BufEnter"}, {
+  callback = function()
+    if is_sv_file() then
+      RefreshDiagnostics()
+    end
+  end,
+})
