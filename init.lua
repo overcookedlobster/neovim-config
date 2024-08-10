@@ -288,6 +288,48 @@ end
 -- Set up a keymap to open the cheatsheet
 vim.api.nvim_set_keymap("n", "<leader>qq", ":lua open_cheatsheet()<CR>", {noremap = true, silent = true})
 
+
+-- Cheatsheet function
+_G.git_tutorial = function()
+  local cheatsheet_path = string.format("~/.config/nvim/cheatsheets/git_cheatsheet.md")
+  
+  if vim.fn.filereadable(vim.fn.expand(cheatsheet_path)) == 1 then
+    -- Open the cheatsheet in a new buffer
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
+    vim.api.nvim_buf_set_option(buf, 'filetype', 'markdown')
+    
+    -- Read the cheatsheet content into the buffer
+    local content = vim.fn.readfile(vim.fn.expand(cheatsheet_path))
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, content)
+    
+    -- Open the buffer in a new window
+    vim.api.nvim_command('vsplit')
+    vim.api.nvim_win_set_buf(0, buf)
+    
+    -- Set some options for better viewing
+    vim.api.nvim_win_set_option(0, 'wrap', false)
+    vim.api.nvim_win_set_option(0, 'conceallevel', 2)
+    vim.api.nvim_win_set_option(0, 'concealcursor', 'nc')
+    
+    -- Open markdown preview
+    vim.cmd('MarkdownPreview')
+    
+    -- Set up an autocommand to close the buffer when leaving the window
+    vim.cmd([[
+      augroup close_cheatsheet
+        autocmd!
+        autocmd WinLeave <buffer> bdelete!
+      augroup END
+    ]])
+  else
+    print(string.format("Git Cheatsheet Not Found"))
+  end
+end
+-- Set up a keymap to open git cheatsheet
+vim.api.nvim_set_keymap("n", "<leader>qg", ":lua git_tutorial()<CR>", {noremap = true, silent = true})
+
 -- Markdown-specific settings
 vim.g.vim_markdown_folding_disabled = 1
 vim.g.vim_markdown_conceal = 2
@@ -505,3 +547,4 @@ vim.api.nvim_create_autocmd({"BufEnter"}, {
 
 
 vim.keymap.set('n', '<leader>mc', ':! make clean all<CR>', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>cf', ':! concat_files<CR>', { noremap = true, silent = false })
