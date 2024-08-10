@@ -1,0 +1,30 @@
+" Anthropic-inspired Neovim colorscheme
+
+set background=light
+highlight clear
+if exists("syntax_on")
+  syntax reset
+endif
+let g:colors_name="anthropic"
+
+" UI elements
+hi Normal guifg=#000000 guibg=#f0ede6
+hi LineNr guifg=#999999 guibg=#e6e3dc
+hi CursorLine guibg=#e6e3dc
+hi Visual guibg=#d8d5ce
+hi Search guibg=#4a90e2 guifg=#ffffff
+hi IncSearch guibg=#3a7bd5 guifg=#ffffff
+hi StatusLine guifg=#000000 guibg=#d8d5ce
+hi StatusLineNC guifg=#666666 guibg=#e6e3dc
+hi VertSplit guifg=#b3b3b3 guibg=#f0ede6
+
+" Syntax highlighting
+hi Comment guifg=#999999
+hi Constant guifg=#2c5fb3
+hi String guifg=#6fcf97
+hi Identifier guifg=#4a90e2
+hi Function guifg=#3a7bd5
+hi Statement guifg=#2c5fb3
+hi PreProc guifg=#4a90e2
+hi Type guifg=#6fcf97
+hi Special guifg=#3a7bd5

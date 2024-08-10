@@ -1,0 +1,61 @@
+local M = {}
+
+local palette = {
+  bg_000 = "#ffffff",
+  bg_100 = "#f5f5f5",
+  bg_400 = "#e0e0e0",
+  bg_500 = "#d0d0d0",
+  border_200 = "#cccccc",
+  border_300 = "#b3b3b3",
+  text_100 = "#000000",
+  text_200 = "#333333",
+  text_300 = "#666666",
+  text_400 = "#999999",
+  text_500 = "#b3b3b3",
+  accent_pro_000 = "#4a90e2",
+  accent_pro_100 = "#3a7bd5",
+  accent_pro_200 = "#2c5fb3",
+  accent_secondary_100 = "#6fcf97",
+  oncolor_100 = "#ffffff",
+}
+
+function M.setup()
+  vim.cmd('hi clear')
+  if vim.fn.exists('syntax_on') then
+    vim.cmd('syntax reset')
+  end
+  vim.o.background = 'light'
+  vim.o.termguicolors = true
+  vim.g.colors_name = 'anthropic'
+
+  local highlight = function(group, fg, bg, attr)
+    fg = fg and 'guifg=' .. fg or 'guifg=NONE'
+    bg = bg and 'guibg=' .. bg or 'guibg=NONE'
+    attr = attr and 'gui=' .. attr or 'gui=NONE'
+    vim.api.nvim_command('highlight ' .. group .. ' ' .. fg .. ' ' .. bg .. ' ' .. attr)
+  end
+
+  -- UI elements
+  highlight('Normal', palette.text_100, palette.bg_000)
+  highlight('LineNr', palette.text_400, palette.bg_100)
+  highlight('CursorLine', nil, palette.bg_400)
+  highlight('Visual', nil, palette.bg_500)
+  highlight('Search', palette.oncolor_100, palette.accent_pro_000)
+  highlight('IncSearch', palette.oncolor_100, palette.accent_pro_100)
+  highlight('StatusLine', palette.text_100, palette.border_200)
+  highlight('StatusLineNC', palette.text_300, palette.bg_400)
+  highlight('VertSplit', palette.border_300, palette.bg_000)
+
+  -- Syntax highlighting
+  highlight('Comment', palette.text_400)
+  highlight('Constant', palette.accent_pro_200)
+  highlight('String', palette.accent_secondary_100)
+  highlight('Identifier', palette.accent_pro_000)
+  highlight('Function', palette.accent_pro_100)
+  highlight('Statement', palette.accent_pro_200)
+  highlight('PreProc', palette.accent_pro_000)
+  highlight('Type', palette.accent_secondary_100)
+  highlight('Special', palette.accent_pro_100)
+end
+
+return M

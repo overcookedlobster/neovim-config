@@ -502,3 +502,6 @@ vim.api.nvim_create_autocmd({"BufEnter"}, {
     end
   end,
 })
+
+
+vim.keymap.set('n', '<leader>mc', ':! make clean all<CR>', { noremap = true, silent = false })
