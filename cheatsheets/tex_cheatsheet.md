@@ -1,4 +1,3 @@
-
 # 📚 LaTeX LuaSnip Cheatsheet 📚
 
 ## 🔑 Key Bindings
@@ -129,4 +128,44 @@
 
 LaTeX + LuaSnip = Efficient Typesetting! 🚀
 
-This cheatsheet provides a more comprehensive overview of the snippets defined in the Lua files. However, due to the complexity and number of snippets, there might still be some that are not included. For the most accurate and up-to-date information, it's always best to refer directly to the Lua files.
+## 📁 Snippet Files Overview
+
+### delimiter.lua
+- Contains snippets for various delimiters and brackets
+- Includes left/right parentheses, square brackets, curly braces
+- Provides big versions of brackets
+- Handles escaped curly braces and LaTeX quotation marks
+
+### static.lua
+- Defines static snippets for common LaTeX commands
+- Includes snippets for quad spaces, newpage, text in math mode
+- Provides snippets for infinity, item, and horizontal lines
+
+### system.lua
+- Contains snippets for document structure and commands
+- Includes snippets for annotate, reference, documentclass, usepackage
+- Provides snippets for labels, TODO notes, and SI units
+
+### math.lua
+- Extensive collection of math-related snippets
+- Includes superscripts, subscripts, fractions, vectors
+- Provides snippets for common math operations and symbols
+
+### luatex.lua
+- Contains snippets specific to LuaTeX
+- Includes a snippet for tex.sprint
+
+### greek.lua
+- Defines snippets for Greek letters
+- Uses `;` as a prefix for quick access to Greek letters
+
+### environments.lua
+- Contains snippets for various LaTeX environments
+- Includes generic environments, equation environments, and list environments
+- Provides snippets for figures and inline math
+
+### fonts.lua
+- Defines snippets for font styling in LaTeX
+- Includes typewriter, italic, bold, and various math font styles
+
+This cheatsheet provides a comprehensive overview of the snippets defined in the Lua files. For the most accurate and up-to-date information, it's always best to refer directly to the Lua files.
