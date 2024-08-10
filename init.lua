@@ -545,6 +545,13 @@ vim.api.nvim_create_autocmd({"BufEnter"}, {
   end,
 })
 
-
 vim.keymap.set('n', '<leader>mc', ':! make clean all<CR>', { noremap = true, silent = false })
 vim.keymap.set('n', '<leader>cf', ':! concat_files<CR>', { noremap = true, silent = false })
+
+
+-- In ~/.config/nvim/init.lua
+vim.api.nvim_set_keymap('n', '<leader>cl', ':lua require("personal.checklist").list_checklists()<CR>', { noremap = true, silent = true })
+vim.api.nvim_create_user_command('ToggleChecklistDebug', function()
+    require('personal.checklist').toggle_debug()
+end, {})
+require("personal.init.copy-paste")

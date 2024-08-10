@@ -1,3 +1,4 @@
+
 local M = {}
 
 -- Configuration options
@@ -69,7 +70,21 @@ local function parse_markdown_and_generate_mapping(markdown_path)
     return mapping
 end
 
-
+-- Function to parse markdown and extract page offset
+local function parse_markdown_and_get_offset(markdown_path)
+    local page_offset = 0
+    
+    for line in io.lines(markdown_path) do
+        local offset = line:match('^Page Offset: (.+)$')
+        if offset then
+            page_offset = tonumber(offset) or 0
+            break
+        end
+    end
+    
+    debug_print("Extracted page offset: " .. page_offset)
+    return page_offset
+end
 -- Function to create a floating window
 local function create_float()
     local width = math.floor(vim.o.columns * 0.8)
@@ -145,7 +160,6 @@ function M.close_checklist()
 end
 
 -- Function to open PDF at the correct page
--- Function to open PDF at the correct page
 function M.open_pdf()
     local markdown_path = vim.api.nvim_buf_get_name(0)
     local pdf_name = vim.fn.fnamemodify(markdown_path, ':t:r') .. '.pdf'
@@ -160,6 +174,9 @@ function M.open_pdf()
     -- Get current line number
     local current_line = vim.api.nvim_win_get_cursor(0)[1]
 
+    -- Parse the markdown file to get the page offset
+    local page_offset = parse_markdown_and_get_offset(markdown_path)
+
     -- Find the nearest previous line with a page number
     local page_number = 1
     for i = current_line, 1, -1 do
@@ -171,8 +188,11 @@ function M.open_pdf()
         end
     end
 
-    debug_print("Opening PDF: " .. pdf_path .. " at page " .. page_number)
-    vim.fn.system(M.config.pdf_viewer .. ' --page=' .. page_number .. ' "' .. pdf_path .. '" &')
+    -- Apply the page offset
+    local adjusted_page = page_number + page_offset
+
+    debug_print("Opening PDF: " .. pdf_path .. " at page " .. adjusted_page)
+    vim.fn.system(M.config.pdf_viewer .. ' --page=' .. adjusted_page .. ' "' .. pdf_path .. '" &')
 end
 
 

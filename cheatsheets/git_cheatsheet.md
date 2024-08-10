@@ -325,3 +325,51 @@ This tutorial has covered the fundamentals and some advanced topics related to G
 Remember, the best way to learn is by doing. Start using these tools in your projects, experiment with different workflows, and don't be afraid to make mistakes – Git's got your back with its ability to revert changes!
 
 Happy coding!
+# Nested Git Repositories
+
+When you create a Git repository inside another Git repository, you create what's known as a "nested repository." Here's what happens:
+
+## Behavior
+
+1. The inner repository (child) is treated as a separate entity from the outer repository (parent).
+2. The parent repository will see the child repository's directory, but won't track its contents.
+3. Git will create a `.git` directory in both the parent and child repositories.
+
+## Implications
+
+1. **Separate Histories**: The child repository maintains its own separate history, branches, and remotes.
+2. **Untracked Directory**: From the parent repository's perspective, the child repository's directory appears as an untracked folder.
+3. **Potential Confusion**: This setup can lead to confusion, as changes in the child repository won't be reflected in the parent's history.
+
+## Example
+
+```
+parent-repo/
+├── .git/
+├── file1.txt
+├── file2.txt
+└── child-repo/
+    ├── .git/
+    ├── fileA.txt
+    └── fileB.txt
+```
+
+In this structure, `parent-repo` is a Git repository, and `child-repo` is another separate Git repository nested inside it.
+
+## Git Submodules
+
+If you intentionally want to include one repository inside another, Git provides a feature called "submodules." Submodules allow you to keep a Git repository as a subdirectory of another Git repository, tracking a specific commit of the nested repository.
+
+To add a submodule:
+
+```bash
+git submodule add <repository-url> <path>
+```
+
+This creates a `.gitmodules` file in the parent repository, which tracks the submodule's location and URL.
+
+## Best Practices
+
+1. Avoid creating nested repositories unintentionally, as they can lead to confusion and complexity.
+2. If you need to include one repository inside another, consider using Git submodules or Git subtrees.
+3. Always be aware of which repository you're working in when dealing with nested structures.
