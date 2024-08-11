@@ -26,8 +26,9 @@ local function load_snippets(file)
         -- Set the environment's metatable to fall back to the global environment
         setmetatable(env, {__index = _G})
         
-        -- Load the file in this environment
-        local chunk, err = loadfile("/home/flyinglobster/.config/nvim/LuaSnip/sv/" .. file .. ".lua", "t", env)
+    local fn = vim.fn
+    local config_path = fn.stdpath('config')
+    local chunk, err = loadfile(config_path .. "/LuaSnip/sv/" .. file .. ".lua", "t", env)
         if chunk then
             return chunk()
         else

@@ -38,7 +38,9 @@ local function load_snippets(file)
         setmetatable(env, {__index = _G})
         
         -- Load the file in this environment
-        local chunk, err = loadfile("/home/flyinglobster/.config/nvim/LuaSnip/tex/" .. file .. ".lua", "t", env)
+        local fn = vim.fn
+        local config_path = fn.stdpath('config')
+        local chunk, err = loadfile(config_path .. "/LuaSnip/tex/" .. file .. ".lua", "t", env)
         if chunk then
             return chunk()
         else
