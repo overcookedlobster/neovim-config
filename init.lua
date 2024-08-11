@@ -62,11 +62,12 @@ require('packer').startup(function(use)
   use 'hrsh7th/cmp-nvim-lsp'
   use { 'jose-elias-alvarez/null-ls.nvim', requires = { 'nvim-lua/plenary.nvim' } }
   use { "folke/trouble.nvim", requires = "kyazdani42/nvim-web-devicons" }
-    use({
+  use({
         "iamcco/markdown-preview.nvim",
         run = function() vim.fn["mkdp#util#install"]() end,
-    })
-    use("preservim/vim-markdown")
+  })
+  use("preservim/vim-markdown")
+  use 'tpope/vim-fugitive'
   if packer_bootstrap then
     require('packer').sync()
   end
