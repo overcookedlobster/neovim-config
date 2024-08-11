@@ -84,6 +84,11 @@ _G.packer_plugins = {
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/cmp-nvim-lsp",
     url = "https://github.com/hrsh7th/cmp-nvim-lsp"
   },
+  ["cmp-omni"] = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/cmp-omni",
+    url = "https://github.com/hrsh7th/cmp-omni"
+  },
   fzf = {
     loaded = true,
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/fzf",
@@ -98,6 +103,16 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/gruvbox",
     url = "https://github.com/morhetz/gruvbox"
+  },
+  ["markdown-preview.nvim"] = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/markdown-preview.nvim",
+    url = "https://github.com/iamcco/markdown-preview.nvim"
+  },
+  ["null-ls.nvim"] = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/null-ls.nvim",
+    url = "https://github.com/jose-elias-alvarez/null-ls.nvim"
   },
   ["nvim-cmp"] = {
     loaded = true,
@@ -154,6 +169,16 @@ _G.packer_plugins = {
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/telescope.nvim",
     url = "https://github.com/nvim-telescope/telescope.nvim"
   },
+  ["trouble.nvim"] = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/trouble.nvim",
+    url = "https://github.com/folke/trouble.nvim"
+  },
+  ["vim-fugitive"] = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/vim-fugitive",
+    url = "https://github.com/tpope/vim-fugitive"
+  },
   ["vim-jukit"] = {
     loaded = true,
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/vim-jukit",
@@ -165,6 +190,11 @@ _G.packer_plugins = {
     only_cond = false,
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/opt/vim-latex-live-preview",
     url = "https://github.com/xuhdev/vim-latex-live-preview"
+  },
+  ["vim-markdown"] = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/vim-markdown",
+    url = "https://github.com/preservim/vim-markdown"
   },
   ["vim-sensible"] = {
     loaded = true,

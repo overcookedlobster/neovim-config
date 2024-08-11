@@ -115,6 +115,7 @@ M.setup = function()
       { name = 'nvim_lsp' },
       { name = 'luasnip' },
       { name = 'latex_files' },
+      { name = 'omni' },
     }, {
       { name = 'buffer' },
     })
@@ -127,6 +128,7 @@ M.setup = function()
       { name = 'nvim_lsp' },
       { name = 'luasnip' },
       { name = 'latex_files' },
+      { name = 'omni' },
       { name = 'latex_files', option = { filetypes = { "tex" } } },
     }, {
       { name = 'buffer' },
@@ -134,4 +136,51 @@ M.setup = function()
   })
 end
 cmp.register_source('latex_files', latex_files_source.new())
-return M
+-- Set up vimtex's omnifunc
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "tex",
+  callback = function()
+    vim.bo.omnifunc = 'vimtex#complete#omnifunc'
+  end,
+})
+
+-- Defer the setup of nvim-cmp to ensure it's loaded
+vim.defer_fn(function()
+  local cmp = require('cmp')
+  cmp.setup({
+    sources = {
+      { name = 'omni' },
+      -- Add other sources you're using
+    },
+    completion = {
+      autocomplete = false, -- Disable automatic popup globally
+    },
+  })
+
+  -- Enable vimtex completion source for LaTeX files
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "tex",
+    callback = function()
+      cmp.setup.buffer({ 
+        sources = {{ name = 'omni' }},
+        completion = {
+          autocomplete = true, -- Enable automatic popup for tex files
+        },
+      })
+    end,
+  })
+
+  -- Set up a keymap to manually trigger completion
+  vim.keymap.set('i', '<C-Space>', function()
+    if cmp.visible() then
+      cmp.close()
+    else
+      cmp.complete()
+    end
+  end, { silent = true })
+end, 100)  -- 100ms delay to ensure plugins are loaded
+
+
+
+
+

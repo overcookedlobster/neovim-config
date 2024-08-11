@@ -12,6 +12,7 @@ require('plugins.null-ls')
 require('plugins.trouble')
 require('plugins.markdown')
 require('plugins.luasnip')
+require('plugins.nvim-cmp')
 -- Load utilities
 require('utils')
 -- Load colorscheme
