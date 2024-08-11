@@ -116,7 +116,7 @@ luasnip.filetype_extend("tex", {"latex"})
 -- Load snippets from Lua files
 local loader_status, loader = pcall(require, "luasnip.loaders.from_lua")
 if loader_status then
-  loader.load({paths = "/home/flyinglobster/.config/nvim/LuaSnip"})
+  loader.load({paths = "~/.config/nvim/LuaSnip"})
 else
   print("Failed to load LuaSnip loader:", loader)
 end
@@ -136,7 +136,7 @@ vim.api.nvim_create_user_command("LuaSnipDebug", function()
   local ls = require("luasnip")
   print("LuaSnip object type:", type(ls))
   print("Snippets table type:", type(ls.snippets))
-  print("Snippet loading path:", vim.fn.expand("/home/flyinglobster/.config/nvim/LuaSnip"))
+  print("Snippet loading path:", vim.fn.expand("~/.config/nvim/LuaSnip"))
   
   local function print_snippets(snippets_table, table_name)
     if type(snippets_table) == "table" then
