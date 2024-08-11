@@ -117,7 +117,9 @@ luasnip.filetype_extend("tex", {"latex"})
 -- Load snippets from Lua files
 local loader_status, loader = pcall(require, "luasnip.loaders.from_lua")
 if loader_status then
-  loader.load({paths = "~/.config/nvim/LuaSnip"})
+  local fn = vim.fn
+  config_path = fn.stdpath('config')
+  loader.load({paths = config_path .. "/LuaSnip"})
 else
   print("Failed to load LuaSnip loader:", loader)
 end
@@ -137,7 +139,10 @@ vim.api.nvim_create_user_command("LuaSnipDebug", function()
   local ls = require("luasnip")
   print("LuaSnip object type:", type(ls))
   print("Snippets table type:", type(ls.snippets))
-  print("Snippet loading path:", vim.fn.expand("~/.config/nvim/LuaSnip"))
+
+  local fn = vim.fn
+  local config_path = fn.stdpath('config')
+  print("Snippet loading path:", vim.fn.expand(config_path .. "/LuaSnip"))
   
   local function print_snippets(snippets_table, table_name)
     if type(snippets_table) == "table" then
@@ -249,7 +254,9 @@ end
 -- Cheatsheet function
 _G.open_cheatsheet = function()
   local filetype = vim.bo.filetype
-  local cheatsheet_path = string.format("~/.config/nvim/cheatsheets/%s_cheatsheet.md", filetype)
+  local fn = vim.fn
+  local config_path = fn.stdpath('config')
+  local cheatsheet_path = string.format(config_path .. "/cheatsheets/%s_cheatsheet.md", filetype)
   
   if vim.fn.filereadable(vim.fn.expand(cheatsheet_path)) == 1 then
     -- Open the cheatsheet in a new buffer
@@ -292,7 +299,8 @@ vim.api.nvim_set_keymap("n", "<leader>qq", ":lua open_cheatsheet()<CR>", {norema
 
 -- Cheatsheet function
 _G.git_tutorial = function()
-  local cheatsheet_path = string.format("~/.config/nvim/cheatsheets/git_cheatsheet.md")
+    local config_path = vim.fn.stdpath('config') 
+  local cheatsheet_path = string.format(config_path .. "/cheatsheets/git_cheatsheet.md")
   
   if vim.fn.filereadable(vim.fn.expand(cheatsheet_path)) == 1 then
     -- Open the cheatsheet in a new buffer
@@ -370,7 +378,8 @@ end
 setup_keymaps()
 
 local function load_snippets()
-  require("luasnip.loaders.from_lua").load({paths = "~/.config/nvim/LuaSnip/sv/"})
+    local config_path = vim.fn.stdpath('config')
+  require("luasnip.loaders.from_lua").load({paths = config_path .. "/LuaSnip/sv/"})
 end
 
 vim.api.nvim_create_autocmd("FileType", {

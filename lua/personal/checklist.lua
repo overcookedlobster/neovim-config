@@ -101,6 +101,29 @@ local function create_float()
     return win_id
 end
 
+local function safe_edit(file_path)
+  local ok, err = pcall(vim.cmd, "edit " .. file_path)
+  if not ok then
+    if err:match("E325") then
+      -- Swap file exists, ask user what to do
+      print("Swap file exists for " .. file_path)
+      local choice = vim.fn.input("(E)dit anyway, (R)ecover, (Q)uit: ")
+      if choice:lower() == "e" then
+        vim.cmd("edit! " .. file_path)
+      elseif choice:lower() == "r" then
+        vim.cmd("recover " .. file_path)
+      else
+        print("Aborted opening the checklist.")
+        return false
+      end
+    else
+      -- Some other error occurred
+      print("Error opening file: " .. err)
+      return false
+    end
+  end
+  return true
+end
 -- Function to display checklist in a floating window
 local function display_checklist(markdown_path)
     local bufnr = vim.fn.bufnr(markdown_path)
