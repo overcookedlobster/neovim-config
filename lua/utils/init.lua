@@ -47,5 +47,34 @@ M.refresh_diagnostics = function()
     print(string.format("Line %d: %s", diagnostic.lnum + 1, diagnostic.message))
   end
 end
+M.setup = function()
+    require('utils.cheatsheet').setup()
+    -- dependency_check
+    local dependency_check = require('utils.dependency_check')
 
+    -- Check for required dependencies
+    local has_git = dependency_check.check_dependency('git', function() return dependency_check.check_command('git') end)
+    local has_node = dependency_check.check_dependency('nodejs', function() return dependency_check.check_command('node') end)
+    local has_python = dependency_check.check_dependency('python3', function() return dependency_check.check_command('python3') end)
+    local has_ripgrep = dependency_check.check_dependency('ripgrep', function() return dependency_check.check_command('rg') end)
+    local has_fd = dependency_check.check_dependency('fd-find', function() return dependency_check.check_command('fd') end)
+    local has_xclip = dependency_check.check_dependency('xclip', function() return dependency_check.check_command('xclip') end)
+    local has_zathura = dependency_check.check_dependency('zathura', function() return dependency_check.check_command('zathura') end)
+
+    -- Now use these flags to conditionally load parts of your configuration
+
+    if has_git then
+      -- Load git-related plugins and configurations
+    end
+
+    if has_node then
+      -- Load Node.js-dependent configurations
+    end
+
+    if has_python then
+      -- Load Python-dependent configurations
+    end
+
+-- ... and so on for other dependencies
+end
 return M

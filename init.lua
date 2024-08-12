@@ -13,8 +13,10 @@ require('plugins.trouble')
 require('plugins.markdown')
 require('plugins.luasnip')
 require('plugins.nvim-cmp')
+
+require('personal.checklist_directory_generator').setup()
 -- Load utilities
-require('utils')
+require('utils').setup()
 -- Load colorscheme
 vim.cmd('colorscheme gruvbox')
 local clipboard_saver = require('clipboard_image_saver')
@@ -25,3 +27,5 @@ clipboard_saver.setup({
 -- Enable VimTeX
 vim.g.vimtex_enabled = 1
 vim.g.vimtex_complete_enabled = 1
+
+

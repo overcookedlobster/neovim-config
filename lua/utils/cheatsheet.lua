@@ -68,4 +68,9 @@ M.git_tutorial = function()
   end
 end
 
+function M.setup()
+  vim.keymap.set('n', '<leader>qq', M.open_cheatsheet, {noremap = true, silent = true, desc = "Open filetype cheatsheet"})
+  vim.keymap.set('n', '<leader>qg', M.git_tutorial, {noremap = true, silent = true, desc = "Open Git tutorial"})
+end
+
 return M
