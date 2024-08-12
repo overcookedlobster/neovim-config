@@ -1,3 +1,4 @@
+
 local ensure_packer = function()
   local fn = vim.fn
   local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
@@ -9,6 +10,13 @@ local ensure_packer = function()
   return false
 end
 
+local status_ok, packer = pcall(require, 'packer')
+if not status_ok then
+  vim.notify('Packer not found. Skipping plugin setup.', vim.log.levels.WARN)
+  return
+end
+
+-- Rest of your packer configuration
 local packer_bootstrap = ensure_packer()
 
 return require('packer').startup(function(use)

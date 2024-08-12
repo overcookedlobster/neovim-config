@@ -4,8 +4,10 @@ local M = {}
 -- Configuration options
 M.config = {
     debug = false,
-    checklist_dir = vim.fn.expand('~/.config/nvim/checklists'),
-    pdf_dir = vim.fn.expand('~/.config/nvim/books'),
+    --checklist_dir = vim.fn.expand('~/.config/nvim/checklists'),
+    checklist_dir = vim.fn.stdpath('config') .. "/checklists",
+    --pdf_dir = vim.fn.expand('~/.config/nvim/books'),
+    pdf_dir = vim.fn.stdpath('config') .. '/books',
     pdf_viewer = 'zathura',
 }
 
