@@ -25,11 +25,11 @@ require('ayu').setup({
 })
 -- vim.opt.background = "dark"
 -- vim.cmd('colorscheme gruvbox')
-vim.o.background = "dark"
+vim.o.background = "light"
 vim.g.gruvbox_material_background = "medium"
 -- vim.g.gruvbox_material_foreground = "soft"
 -- vim.g.gruvbox_material_better_performance = 1
-vim.cmd("colorscheme ayu")
+vim.cmd("colorscheme ayu-mirage")
 
 local clipboard_saver = require('clipboard_image_saver')
 clipboard_saver.setup({
@@ -91,12 +91,12 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- -- Enable omni completion
--- vim.o.omnifunc = 'syntaxcomplete#Complete'
---
--- -- Enable omni completion for all file types
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = "*",
---   callback = function()
---     vim.bo.omnifunc = 'syntaxcomplete#Complete'
---   end,
--- })
+ vim.o.omnifunc = 'syntaxcomplete#Complete'
+
+ -- Enable omni completion for all file types
+ vim.api.nvim_create_autocmd("FileType", {
+   pattern = "*",
+   callback = function()
+     vim.bo.omnifunc = 'syntaxcomplete#Complete'
+   end,
+ })

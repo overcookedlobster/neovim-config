@@ -13,7 +13,13 @@ keymap('n', '<leader>fc', require('telescope.builtin').current_buffer_fuzzy_find
 keymap('n', '<leader>fm', require('telescope.builtin').marks, {})
 keymap('n', '<leader>fk', require('telescope.builtin').keymaps, {})
 keymap('n', '<leader>fs', require('telescope.builtin').git_status, {})
-keymap('n', '<leader>fp', '<cmd>Telescope file_browser<CR>', {})
+keymap('n', '<leader>fpp', '<cmd>Telescope file_browser<CR>', {})
+vim.api.nvim_set_keymap(
+  "n",
+  "<leader>fp",
+  ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
+  { noremap = true }
+)
 
 -- Other keymaps
 keymap('n', '<leader>xx', '<cmd>Trouble<cr>', {silent = true, noremap = true})
