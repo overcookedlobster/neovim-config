@@ -31,7 +31,14 @@ return require('packer').startup(function(use)
   use 'nvim-telescope/telescope-file-browser.nvim'
   use 'crispgm/telescope-heading.nvim'
   use 'jakemason/ouroboros'
-  use 'morhetz/gruvbox'
+
+-- Colors
+  use 'Shatur/neovim-ayu'
+  -- use 'morhetz/gruvbox'
+  use 'sainnhe/gruvbox-material'
+  use 'cideM/yui'
+  use 'jsit/toast.vim'
+
   use 'luk400/vim-jukit'
   use {'junegunn/fzf', run = function() vim.fn['fzf#install']() end}
   use {'ibhagwan/fzf-lua', branch = 'main'}
@@ -41,6 +48,10 @@ return require('packer').startup(function(use)
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-omni'
   use 'hrsh7th/cmp-nvim-lsp'
+  use 'hrsh7th/cmp-buffer'
+  use 'hrsh7th/cmp-path'
+  use 'hrsh7th/cmp-cmdline'
+  use 'saadparwaiz1/cmp_luasnip'
   use 'numToStr/Comment.nvim'
   use { 'jose-elias-alvarez/null-ls.nvim', requires = { 'nvim-lua/plenary.nvim' } }
   use { "folke/trouble.nvim", requires = "kyazdani42/nvim-web-devicons" }

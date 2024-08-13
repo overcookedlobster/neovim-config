@@ -3,7 +3,8 @@ if not status_ok then
   print("Comment.nvim not found")
   return
 end
-  comment.setup({  
+
+comment.setup({  
       padding = true,
     sticky = true,
     ignore = nil,
