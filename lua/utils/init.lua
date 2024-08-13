@@ -57,7 +57,7 @@ M.setup = function()
     local has_node = dependency_check.check_dependency('nodejs', function() return dependency_check.check_command('node') end)
     local has_python = dependency_check.check_dependency('python3', function() return dependency_check.check_command('python3') end)
     local has_ripgrep = dependency_check.check_dependency('ripgrep', function() return dependency_check.check_command('rg') end)
-    local has_fd = dependency_check.check_dependency('fd-find', function() return dependency_check.check_command('fd') end)
+--    local has_fd = dependency_check.check_dependency('fd-find', function() return dependency_check.check_command('fd') end)
     local has_xclip = dependency_check.check_dependency('xclip', function() return dependency_check.check_command('xclip') end)
     local has_zathura = dependency_check.check_dependency('zathura', function() return dependency_check.check_command('zathura') end)
 

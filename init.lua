@@ -36,3 +36,44 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+vim.api.nvim_create_user_command('ReloadConfig', function()
+    -- Unload all loaded modules
+    for name,_ in pairs(package.loaded) do
+        if name:match('^plugins') or name:match('^core') then
+            package.loaded[name] = nil
+        end
+    end
+
+    -- Source init.lua
+    dofile(vim.env.MYVIMRC)
+
+    -- Reload some critical runtime files
+    local function safe_source(file)
+        local ok, err = pcall(vim.cmd, 'silent! source ' .. file)
+        if not ok then
+            print('Error sourcing ' .. file .. ': ' .. err)
+        end
+    end
+
+    safe_source(vim.fn.stdpath('config') .. '/plugin/**/*.vim')
+    safe_source(vim.fn.stdpath('config') .. '/plugin/**/*.lua')
+    safe_source(vim.fn.stdpath('config') .. '/ftplugin/**/*.vim')
+    safe_source(vim.fn.stdpath('config') .. '/ftplugin/**/*.lua')
+
+    -- Manually trigger some reloads
+    require('plugins.LuaSnip') -- Reload LuaSnip config
+    require('plugins.nvim-cmp') -- Reload nvim-cmp config
+
+    -- Force re-detection of filetype for the current buffer
+    vim.cmd('filetype detect')
+
+    print('Configuration reloaded!')
+end, {})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "*",
+  callback = function()
+    if vim.b.undo_ftplugin == nil then
+      vim.b.undo_ftplugin = ""
+    end
+  end
+})

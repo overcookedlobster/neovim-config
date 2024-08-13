@@ -2,13 +2,14 @@ local opt = vim.opt
 
 -- Basic configuration settings
 opt.number = true
+opt.relativenumber = true
 opt.cursorline = true
 opt.ruler = true
 opt.showcmd = true
-opt.hlsearch = false
+opt.hlsearch = true
 opt.incsearch = false
 opt.showmode = false
-opt.foldenable = false
+opt.foldenable = true
 opt.foldmethod = "marker"
 opt.autowriteall = true
 opt.wrap = true

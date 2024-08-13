@@ -19,7 +19,7 @@ let g:vimtex_indent_enabled   = 0      " turn off VimTeX indentation
 let g:vimtex_imaps_enabled    = 0      " disable insert mode mappings (e.g. if you use UltiSnips)
 let g:vimtex_complete_enabled = 0      " turn off completion
 let g:vimtex_syntax_enabled   = 1      " disable syntax conceal
-imap <silent><expr> <Tab> luasnip#expandable() ? '<Plug>luasnip-expand-snippet' : '<Tab>'
+""imap <silent><expr> <Tab> luasnip#expandable() ? '<Plug>luasnip-expand-snippet' : '<Tab>'
 
 " Jump forward
 imap <silent><expr> jk luasnip#jumpable(1) ? '<Plug>luasnip-jump-next' : 'jk'
