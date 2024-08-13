@@ -22,3 +22,32 @@ keymap('n', '<leader>mc', ':! make clean all<CR>', { noremap = true, silent = fa
 keymap('n', '<leader>cf', ':! concat_files<CR>', { noremap = true, silent = false })
 keymap('n', '<leader>cl', ':lua require("personal.checklist").list_checklists()<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<Leader>rc', ':ReloadConfig<CR>', {noremap = true, silent = true})
+
+-- IN CASE COMMENT ERROR LAGI
+--vim.keymap.set('n', '<leader>/', function()
+--  require('Comment.api').toggle.linewise.current()
+--end, { noremap = true, silent = true, desc = "Toggle comment" })
+--local api = require('Comment.api')
+--
+--
+--local function comment_visual_selection()
+--  local mode = vim.fn.visualmode()
+--  local s_start = vim.fn.getpos("'<")
+--  local s_end = vim.fn.getpos("'>")
+--  local n_lines = math.abs(s_end[2] - s_start[2]) + 1
+--
+--  -- Store the current cursor position
+--  local cur_pos = vim.fn.getcurpos()
+--
+--  -- Move to the start of the visual selection
+--  vim.cmd("normal! `<")
+--
+--  -- Comment the lines
+--  api.toggle.linewise(mode)
+--
+--  -- Restore the cursor position
+--  vim.fn.setpos('.', cur_pos)
+--end
+--
+--vim.keymap.set('x', 'gll', comment_visual_selection, {noremap = true, silent = true})
+--vim.keymap.set('x', 'gcc', comment_visual_selection, {noremap = true, silent = true})

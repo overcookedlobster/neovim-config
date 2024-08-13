@@ -1,30 +1,30 @@
-require('Comment').setup({
-  ---LHS of toggle mappings in NORMAL + VISUAL mode
-  ---@type table
-  toggler = {
-      ---Line-comment toggle keymap
-      line = 'gll',
-      ---Block-comment toggle keymap
-      block = 'gcc',
-  },
-
-  ---LHS of operator-pending mappings in NORMAL + VISUAL mode
-  ---@type table
-  opleader = {
-      ---Line-comment keymap
-      line = 'gl',
-      ---Block-comment keymap
-      block = 'gc',
-  },
-
-  ---LHS of extra mappings
-  ---@type table
-  extra = {
-      ---Add comment on the line above
-      above = 'gcO',
-      ---Add comment on the line below
-      below = 'gco',
-      ---Add comment at the end of line
-      eol = 'gcA',
-  },
+local status_ok, comment = pcall(require, "Comment")
+if not status_ok then
+  print("Comment.nvim not found")
+  return
+end
+  comment.setup({  
+      padding = true,
+    sticky = true,
+    ignore = nil,
+    toggler = {
+        line = 'gll',
+        block = 'gcc',
+    },
+    opleader = {
+        line = 'gl',
+        block = 'gc',
+    },
+    extra = {
+        above = 'gcO',
+        below = 'gco',
+        eol = 'gcA',
+    },
+    mappings = {
+        basic = true,
+        extra = true,
+        extended = false,
+    },
+    pre_hook = nil,
+    post_hook = nil,
 })
