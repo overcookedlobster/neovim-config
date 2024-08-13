@@ -26,6 +26,13 @@ clipboard_saver.setup({
 })
 -- Enable VimTeX
 vim.g.vimtex_enabled = 1
+vim.g.vimtex_compiler_progname = 'nvr'
 vim.g.vimtex_complete_enabled = 1
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "tex",
+  callback = function()
+    vim.bo.omnifunc = 'vimtex#complete#omnifunc'
+  end,
+})
 

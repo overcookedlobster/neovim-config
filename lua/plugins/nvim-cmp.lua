@@ -118,6 +118,13 @@ M.setup = function()
       { name = 'omni' },
     }, {
       { name = 'buffer' },
+    filetype_specific = {
+    tex = {
+      experimental = {
+        ghost_text = false,
+      },
+    },
+  },
     })
   })
 
@@ -170,26 +177,33 @@ vim.defer_fn(function()
       end,
     }),
     sources = {
-      { name = 'omni' },
+        { name = 'omni' },
+        { name = 'nvim_lsp' },
+        { name = 'buffer' },
       -- Add other sources you're using
     },
     completion = {
       autocomplete = false, -- Disable automatic popup globally
     },
+      -- Disable autoindent
+  experimental = {
+    ghost_text = false,
+  },
   })
 
+  --BELOW IS CAUSING MANY ERRORS
   -- Enable vimtex completion source for LaTeX files
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "tex",
-    callback = function()
-      cmp.setup.buffer({ 
-        sources = {{ name = 'omni' }},
-        completion = {
-          autocomplete = true, -- Enable automatic popup for tex files
-        },
-      })
-    end,
-  })
+--  vim.api.nvim_create_autocmd("FileType", {
+--    pattern = "tex",
+--    callback = function()
+--      cmp.setup.buffer({ 
+--        sources = {{ name = 'omni' }},
+--        completion = {
+--          autocomplete = true, -- Enable automatic popup for tex files
+--        },
+--      })
+--    end,
+--  })
 
   -- Set up a keymap to manually trigger completion
   vim.keymap.set('i', '<C-Space>', function()
