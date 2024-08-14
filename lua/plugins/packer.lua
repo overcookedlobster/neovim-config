@@ -54,9 +54,9 @@ return require('packer').startup(function(use)
           -- openai = {
           --   api_key = os.getenv "OPENAI_API_KEY",
           -- },
-          -- anthropic = {
-          --   api_key = os.getenv "ANTHROPIC_API_KEY",
-          -- },
+           anthropic = {
+             api_key = os.getenv "ANTHROPIC_API_KEY",
+           },
           -- mistral = {
           --   api_key = os.getenv "MISTRAL_API_KEY",
           -- },
@@ -68,6 +68,12 @@ return require('packer').startup(function(use)
           -- },
           ollama = {} -- provide an empty list to make provider available
         },
+        
+    -- The interactive user input appearing when can be "native" for
+    -- vim.ui.input or "buffer" to query the input within a native nvim buffer
+    -- (see video demonstrations below)
+        user_input_ui = "native",
+
       }
     end,
     }
