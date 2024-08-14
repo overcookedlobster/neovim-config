@@ -54,9 +54,19 @@ return require('packer').startup(function(use)
           -- openai = {
           --   api_key = os.getenv "OPENAI_API_KEY",
           -- },
-           anthropic = {
-             api_key = os.getenv "ANTHROPIC_API_KEY",
-           },
+          anthropic = {
+            api_key = os.getenv "ANTHROPIC_API_KEY",
+            endpoint = "https://api.anthropic.com/v1/messages",
+            topic_prompt = "You only respond with 3 to 4 words to summarize the past conversation.",
+            topic = {
+              model = "claude-3-haiku-20240307",
+              params = { max_tokens = 32 },
+            },
+            params = {
+              chat = { max_tokens = 4096 },
+              command = { max_tokens = 4096 },
+            },
+          },
           -- mistral = {
           --   api_key = os.getenv "MISTRAL_API_KEY",
           -- },

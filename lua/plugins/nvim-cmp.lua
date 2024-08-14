@@ -1,4 +1,5 @@
 local cmp = require('cmp')
+local luasnip = require('luasnip')
 local uv = vim.loop or vim.uv  -- Use vim.loop for Neovim < 0.10.0, vim.uv for >= 0.10.0
 local path = require('plenary.path')
 local latex_files_source = require('latex_files_sources')
@@ -159,64 +160,52 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- Defer the setup of nvim-cmp to ensure it's loaded
 vim.defer_fn(function()
-  local cmp = require('cmp')
   cmp.setup({
+    snippet = {
+      expand = function(args)
+        luasnip.lsp_expand(args.body)
+      end,
+    },
     mapping = cmp.mapping.preset.insert({
       ['<C-b>'] = cmp.mapping.scroll_docs(-4),
       ['<C-f>'] = cmp.mapping.scroll_docs(4),
       ['<C-Space>'] = cmp.mapping.complete(),
       ['<C-e>'] = cmp.mapping.abort(),
       ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    ["<Tab>"] = cmp.mapping(function(fallback)
-     if cmp.visible() then
-       cmp.select_next_item()
-     elseif luasnip.expand_or_jumpable() then
-       luasnip.expand_or_jump()
-     else
-       fallback()
-     end
-    end, { "i", "s" }),
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
-     if cmp.visible() then
-       cmp.select_prev_item()
-     elseif luasnip.jumpable(-1) then
-       luasnip.jump(-1)
-     else
-       fallback()
-     end
-    end, { "i", "s" }),
-  }),
-    sources = {
-        { name = 'omni' },
-        { name = 'nvim_lsp' },
-        { name = 'vimtex' },
-        -- { name = 'buffer' },
-      -- Add other sources you're using
-    },
+      ["<Tab>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        else
+          fallback()
+        end
+      end, { "i", "s" }),
+      ["<S-Tab>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        elseif luasnip.jumpable(-1) then
+          luasnip.jump(-1)
+        else
+          fallback()
+        end
+      end, { "i", "s" }),
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
+      { name = 'omni' },
+      { name = 'vimtex' },
+      -- { name = 'buffer' },
+    }),
     completion = {
       autocomplete = false, -- Disable automatic popup globally
     },
-      -- Disable autoindent
-  experimental = {
-    ghost_text = false,
-  },
+    experimental = {
+      ghost_text = false,
+    },
   })
-
-  --BELOW IS CAUSING MANY ERRORS
-  -- Enable vimtex completion source for LaTeX files
-  -- vim.api.nvim_create_autocmd("FileType", {
-  --   pattern = "tex",
-  --   callback = function()
-  --     cmp.setup.buffer({ 
-  --       sources = {{ name = 'omni' }},
-  --       completion = {
-  --         autocomplete = true, -- Enable automatic popup for tex files
-  --       },
-  --     })
-  --   end,
-  -- })
 
   -- Set up a keymap to manually trigger completion
   vim.keymap.set('i', '<C-Space>', function()
