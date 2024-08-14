@@ -25,7 +25,7 @@ require('ayu').setup({
 })
 -- vim.opt.background = "dark"
 -- vim.cmd('colorscheme gruvbox')
-vim.o.background = "light"
+vim.o.background = "dark"
 vim.g.gruvbox_material_background = "hard"
 vim.g.gruvbox_material_ui_contrast = "high"
 vim.g.gruvbox_material_foreground = "original"
@@ -85,22 +85,22 @@ vim.api.nvim_create_user_command('ReloadConfig', function()
 
     print('Configuration reloaded!')
 end, {})
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "*",
-  callback = function()
-    if vim.b.undo_ftplugin == nil then
-      vim.b.undo_ftplugin = ""
-    end
-  end
-})
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = "*",
+--   callback = function()
+--     if vim.b.undo_ftplugin == nil then
+--       vim.b.undo_ftplugin = ""
+--     end
+--   end
+-- })
 
 -- -- Enable omni completion
- vim.o.omnifunc = 'syntaxcomplete#Complete'
+vim.o.omnifunc = 'syntaxcomplete#Complete'
 
  -- Enable omni completion for all file types
- vim.api.nvim_create_autocmd("FileType", {
-   pattern = "*",
-   callback = function()
-     vim.bo.omnifunc = 'syntaxcomplete#Complete'
-   end,
- })
+ -- vim.api.nvim_create_autocmd("FileType", {
+ --   pattern = "*",
+ --   callback = function()
+ --     vim.bo.omnifunc = 'syntaxcomplete#Complete'
+ --   end,
+ -- })
