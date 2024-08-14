@@ -4,6 +4,18 @@
 if exists("b:did_myvimtexsettings")
   finish
 endif
+if !exists('g:vimtex_compiler_latexmk')
+  let g:vimtex_compiler_latexmk = {}
+endif
+if !has_key(g:vimtex_compiler_latexmk, 'options')
+  let g:vimtex_compiler_latexmk.options = [
+    \ '-pdf',
+    \ '-verbose',
+    \ '-file-line-error',
+    \ '-synctex=1',
+    \ '-interaction=nonstopmode',
+  \ ]
+endif
 let b:did_myvimtexsettings = 1
 
 nmap <leader>i <plug>(vimtex-info)
@@ -14,7 +26,11 @@ nmap <leader>t <CMD>VimtexTocToggle<CR>
 " ---------------------------------------------
 " Toggles shell escape compilation on and off
 function! s:TexToggleShellEscape() abort
-  if g:vimtex_compiler_latexmk.options[0] ==# '-shell-escape'
+  if !has_key(g:vimtex_compiler_latexmk, 'options')
+    let g:vimtex_compiler_latexmk.options = []
+  endif
+  
+  if !empty(g:vimtex_compiler_latexmk.options) && g:vimtex_compiler_latexmk.options[0] ==# '-shell-escape'
     " Disable shell escape
     call remove(g:vimtex_compiler_latexmk.options, 0)
   else
@@ -33,9 +49,13 @@ nnoremap <SID>TexToggleShellEscape :call <SID>TexToggleShellEscape()<CR>
 " document preamble and enable shell escape if minted is detected.
 silent execute '!head -n 20 ' . expand('%') . ' | grep "minted" > /dev/null'
 if ! v:shell_error  " 'minted' found in preamble
-  call insert(g:vimtex_compiler_latexmk.options, '-shell-escape', 0)
-endif
-" ---------------------------------------------
+  if !has_key(g:vimtex_compiler_latexmk, 'options')
+    let g:vimtex_compiler_latexmk.options = []
+  endif
+  if index(g:vimtex_compiler_latexmk.options, '-shell-escape') == -1
+    call insert(g:vimtex_compiler_latexmk.options, '-shell-escape', 0)
+  endif
+endif" ---------------------------------------------
 
 " Close viewers when VimTeX buffers are closed (see :help vimtex-events)
 function! CloseViewers()

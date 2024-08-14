@@ -27,7 +27,7 @@ require('ayu').setup({
 -- vim.opt.background = "dark"
 -- vim.cmd('colorscheme gruvbox')
 vim.o.background = "dark"
-vim.g.gruvbox_material_background = "hard"
+vim.g.gruvbox_material_background = "medium"
 vim.g.gruvbox_material_ui_contrast = "high"
 vim.g.gruvbox_material_foreground = "original"
 vim.g.gruvbox_material_enable_italic = 1
@@ -42,9 +42,20 @@ clipboard_saver.setup({
   name_format = "screenshot_{timestamp}_{count}"
 })
 -- Enable VimTeX
+vim.g.vimtex_compiler_latexmk = {
+  options = {
+    '-pdf',
+    '-shell-escape',
+    '-verbose',
+    '-file-line-error',
+    '-synctex=1',
+    '-interaction=nonstopmode',
+  },
+}
 vim.g.vimtex_enabled = 1
 vim.g.vimtex_compiler_progname = 'nvr'
 vim.g.vimtex_complete_enabled = 1
+vim.g.vimtex_compiler_latexmk = {build_dir = ''}
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "tex",

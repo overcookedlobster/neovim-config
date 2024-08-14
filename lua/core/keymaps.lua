@@ -27,7 +27,7 @@ keymap('n', '<leader>hc', '<Cmd>HighlightColorsToggle<CR>', {})
 keymap('n', '<leader>mc', ':! make clean all<CR>', { noremap = true, silent = false })
 keymap('n', '<leader>cf', ':! concat_files<CR>', { noremap = true, silent = false })
 keymap('n', '<leader>cl', ':lua require("personal.checklist").list_checklists()<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<Leader>rc', ':ReloadConfig<CR>', {noremap = true, silent = true})
+keymap('n', '<Leader>re', ':ReloadConfig<CR>', {noremap = true, silent = true})
 -- vim.api.nvim_set_keymap('i', '<C-Space>', 'v:lua.require\'cmp\'.complete()', {expr = true, silent = true})
 
 -- IN CASE COMMENT ERROR LAGI
