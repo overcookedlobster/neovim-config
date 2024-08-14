@@ -1,9 +1,7 @@
 local cmp = require('cmp')
-local lfs = require('lfs')
+local uv = vim.loop or vim.uv  -- Use vim.loop for Neovim < 0.10.0, vim.uv for >= 0.10.0
 local path = require('plenary.path')
-
 local source = {}
-
 source.new = function()
   return setmetatable({}, { __index = source })
 end
@@ -44,24 +42,28 @@ local function get_files(types)
   local files = {}
   local root_dir = find_latex_root()
   local seen = {}
-
   local function scan_dir(dir)
-    for file in lfs.dir(dir) do
-      if file ~= "." and file ~= ".." then
-        local full_path = path:new(dir, file):absolute()
+    local handle = uv.fs_scandir(dir)
+    if not handle then return end
+    
+    local function iter()
+      return uv.fs_scandir_next(handle)
+    end
+    
+    for name, type in iter do
+      if name ~= "." and name ~= ".." then
+        local full_path = path:new(dir, name):absolute()
         if not seen[full_path] then
           seen[full_path] = true
-          local attr = lfs.attributes(full_path)
-          if attr.mode == "directory" then
+          if type == "directory" then
             scan_dir(full_path)
-          elseif attr.mode == "file" and is_supported_file(file, types) then
+          elseif type == "file" and is_supported_file(name, types) then
             table.insert(files, path:new(full_path):make_relative(root_dir))
           end
         end
       end
     end
   end
-
   scan_dir(root_dir)
   return files
 end

@@ -15,6 +15,7 @@ require('plugins.luasnip')
 require('plugins.nvim-cmp')
 require('plugins.Comment')
 require('personal.checklist_directory_generator').setup()
+
 -- Load utilities
 require('utils').setup()
 -- Load colorscheme

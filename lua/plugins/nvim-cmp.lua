@@ -1,5 +1,5 @@
 local cmp = require('cmp')
-local lfs = require('lfs')
+local uv = vim.loop or vim.uv  -- Use vim.loop for Neovim < 0.10.0, vim.uv for >= 0.10.0
 local path = require('plenary.path')
 local latex_files_source = require('latex_files_sources')
 local M = {}
@@ -19,16 +19,21 @@ local function get_files(dirs, types)
   local files = {}
   local seen = {}
   local function recursive_search(dir)
-    for file in lfs.dir(dir) do
-      if file ~= "." and file ~= ".." then
-        local f = path:new(dir, file)
-        local full_path = f:absolute()
+    local handle = uv.fs_scandir(dir)
+    if not handle then return end
+    
+    local function iter()
+      return uv.fs_scandir_next(handle)
+    end
+    
+    for name, type in iter do
+      if name ~= "." and name ~= ".." then
+        local full_path = path:new(dir, name):absolute()
         if not seen[full_path] then
           seen[full_path] = true
-          local attr = lfs.attributes(full_path)
-          if attr and attr.mode == "directory" then
+          if type == "directory" then
             recursive_search(full_path)
-          elseif attr and attr.mode == "file" and is_supported_file(file, types) then
+          elseif type == "file" and is_supported_file(name, types) then
             table.insert(files, path:new(full_path):make_relative(vim.fn.getcwd()))
           end
         end
@@ -110,79 +115,42 @@ latex_source.complete = function(self, params, callback)
 end
 
 M.setup = function()
-  -- cmp.setup({
-  --   sources = cmp.config.sources({
-  --     { name = 'nvim_lsp' },
-  --     { name = 'luasnip' },
-  --     { name = 'latex_files' },
-  --     { name = 'path' },
-  --     { name = 'omni' },
-  --   }, {
-  --     { name = 'buffer' },
-  --   filetype_specific = {
-  --   tex = {
-  --     experimental = {
-  --       ghost_text = false,
-  --     },
-  --   },
-  -- },
-  --   })
-  -- })
-
-      cmp.setup({
-  -- ... other configurations ...
-  
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'latex_files' },
-    { name = 'omni' },
-    -- { name = 'buffer' },
-  }),
-  
-  -- ... other configurations ...
-})
-
-  cmp.register_source('latex_files', latex_source.new())
-cmp.register_source('latex_files', latex_files_source.new())
-
-
-  -- cmp.setup.filetype('tex', {
-  --   sources = cmp.config.sources({
-  --     { name = 'nvim_lsp' },
-  --     { name = 'luasnip' },
-  --     { name = 'latex_files' },
-  --     { name = 'omni' },
-  --     { name = 'latex_files', option = { filetypes = { "tex" } } },
-  --   }, {
-  --     { name = 'buffer' },
-  --   })
-  -- })
-cmp.setup.filetype('tex', {
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'latex_symbols' },
+  cmp.setup({
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
       { name = 'latex_files' },
-    { name = 'vimtex' },
-    { name = 'omni' },
-    -- { name = 'buffer' },
+      { name = 'omni' },
+      { name = 'vimtex' },
+    }),
+    mapping = cmp.mapping.preset.insert({
+      -- Your existing mappings...
+    }),
+    completion = {
+      autocomplete = false, -- Disable automatic popup globally
+    },
+    experimental = {
+      ghost_text = false,
+    },
   })
-})
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "tex",
-  callback = function()
-    require('cmp').setup.buffer({ 
-      completion = {
-        autocomplete = true, -- Enable automatic popup for tex files
-      },
-    })
-  end,
-})
+  cmp.setup.filetype('tex', {
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
+      { name = 'latex_symbols' },
+      { name = 'latex_files' },
+      { name = 'vimtex' },
+      { name = 'omni' },
+    }),
+    completion = {
+      autocomplete = true, -- Enable automatic popup for tex files
+    },
+  })
+
+  cmp.register_source('latex_files', latex_files_source.new())
 end
 
-cmp.register_source('latex_files', latex_files_source.new())
 -- Set up vimtex's omnifunc
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "tex",
