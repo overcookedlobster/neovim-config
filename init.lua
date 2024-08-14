@@ -26,10 +26,14 @@ require('ayu').setup({
 -- vim.opt.background = "dark"
 -- vim.cmd('colorscheme gruvbox')
 vim.o.background = "light"
-vim.g.gruvbox_material_background = "medium"
--- vim.g.gruvbox_material_foreground = "soft"
+vim.g.gruvbox_material_background = "hard"
+vim.g.gruvbox_material_ui_contrast = "high"
+vim.g.gruvbox_material_foreground = "original"
+vim.g.gruvbox_material_enable_italic = 1
+vim.g.gruvbox_material_enable_bold = 1
+vim.g.gruvbox_material_visual ="red background"
 -- vim.g.gruvbox_material_better_performance = 1
-vim.cmd("colorscheme ayu-mirage")
+vim.cmd("colorscheme gruvbox-material")
 
 local clipboard_saver = require('clipboard_image_saver')
 clipboard_saver.setup({
