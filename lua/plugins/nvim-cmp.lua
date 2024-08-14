@@ -110,38 +110,78 @@ latex_source.complete = function(self, params, callback)
 end
 
 M.setup = function()
-  cmp.setup({
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-      { name = 'luasnip' },
-      { name = 'latex_files' },
-      { name = 'omni' },
-    }, {
-      { name = 'buffer' },
-    filetype_specific = {
-    tex = {
-      experimental = {
-        ghost_text = false,
-      },
-    },
-  },
-    })
-  })
+  -- cmp.setup({
+  --   sources = cmp.config.sources({
+  --     { name = 'nvim_lsp' },
+  --     { name = 'luasnip' },
+  --     { name = 'latex_files' },
+  --     { name = 'path' },
+  --     { name = 'omni' },
+  --   }, {
+  --     { name = 'buffer' },
+  --   filetype_specific = {
+  --   tex = {
+  --     experimental = {
+  --       ghost_text = false,
+  --     },
+  --   },
+  -- },
+  --   })
+  -- })
+
+      cmp.setup({
+  -- ... other configurations ...
+  
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+    { name = 'latex_files' },
+    { name = 'omni' },
+    -- { name = 'buffer' },
+  }),
+  
+  -- ... other configurations ...
+})
 
   cmp.register_source('latex_files', latex_source.new())
+cmp.register_source('latex_files', latex_files_source.new())
 
-  cmp.setup.filetype('tex', {
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-      { name = 'luasnip' },
+
+  -- cmp.setup.filetype('tex', {
+  --   sources = cmp.config.sources({
+  --     { name = 'nvim_lsp' },
+  --     { name = 'luasnip' },
+  --     { name = 'latex_files' },
+  --     { name = 'omni' },
+  --     { name = 'latex_files', option = { filetypes = { "tex" } } },
+  --   }, {
+  --     { name = 'buffer' },
+  --   })
+  -- })
+cmp.setup.filetype('tex', {
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+    { name = 'latex_symbols' },
       { name = 'latex_files' },
-      { name = 'omni' },
-      { name = 'latex_files', option = { filetypes = { "tex" } } },
-    }, {
-      { name = 'buffer' },
-    })
+    { name = 'vimtex' },
+    { name = 'omni' },
+    -- { name = 'buffer' },
   })
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "tex",
+  callback = function()
+    require('cmp').setup.buffer({ 
+      completion = {
+        autocomplete = true, -- Enable automatic popup for tex files
+      },
+    })
+  end,
+})
 end
+
 cmp.register_source('latex_files', latex_files_source.new())
 -- Set up vimtex's omnifunc
 vim.api.nvim_create_autocmd("FileType", {
@@ -183,7 +223,8 @@ vim.defer_fn(function()
     sources = {
         { name = 'omni' },
         { name = 'nvim_lsp' },
-        { name = 'buffer' },
+        { name = 'vimtex' },
+        -- { name = 'buffer' },
       -- Add other sources you're using
     },
     completion = {
@@ -197,17 +238,17 @@ vim.defer_fn(function()
 
   --BELOW IS CAUSING MANY ERRORS
   -- Enable vimtex completion source for LaTeX files
---  vim.api.nvim_create_autocmd("FileType", {
---    pattern = "tex",
---    callback = function()
---      cmp.setup.buffer({ 
---        sources = {{ name = 'omni' }},
---        completion = {
---          autocomplete = true, -- Enable automatic popup for tex files
---        },
---      })
---    end,
---  })
+  -- vim.api.nvim_create_autocmd("FileType", {
+  --   pattern = "tex",
+  --   callback = function()
+  --     cmp.setup.buffer({ 
+  --       sources = {{ name = 'omni' }},
+  --       completion = {
+  --         autocomplete = true, -- Enable automatic popup for tex files
+  --       },
+  --     })
+  --   end,
+  -- })
 
   -- Set up a keymap to manually trigger completion
   vim.keymap.set('i', '<C-Space>', function()

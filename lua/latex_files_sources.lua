@@ -77,6 +77,8 @@ function source:complete(params, callback)
     types = self.file_types.img
   elseif command == "bibliography" then
     types = self.file_types.bib
+  elseif command == "input" or command == "include" then
+    types = self.file_types.tex
   end
 
   local items = {}
