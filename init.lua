@@ -26,15 +26,14 @@ require('ayu').setup({
 })
 -- vim.opt.background = "dark"
 -- vim.cmd('colorscheme gruvbox')
-vim.o.background = "dark"
-vim.g.gruvbox_material_background = "medium"
+vim.o.background = "dark" vim.g.gruvbox_material_background = "soft"
 vim.g.gruvbox_material_ui_contrast = "high"
 vim.g.gruvbox_material_foreground = "original"
 vim.g.gruvbox_material_enable_italic = 1
 vim.g.gruvbox_material_enable_bold = 1
 vim.g.gruvbox_material_visual ="red background"
 -- vim.g.gruvbox_material_better_performance = 1
-vim.cmd("colorscheme gruvbox-material")
+vim.cmd("colorscheme lunaperche")
 
 local clipboard_saver = require('clipboard_image_saver')
 clipboard_saver.setup({
@@ -116,3 +115,23 @@ vim.o.omnifunc = 'syntaxcomplete#Complete'
  --     vim.bo.omnifunc = 'syntaxcomplete#Complete'
  --   end,
  -- })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "tex",
+  callback = function()
+    -- Use vim-surround to delete surroundings
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d(', 'ds(', {noremap = false, silent = true})
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d[', 'ds[', {noremap = false, silent = true})
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d{', 'ds{', {noremap = false, silent = true})
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d"', 'ds"', {noremap = false, silent = true})
+    
+    -- Add LaTeX-specific surroundings
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>se', 'ysiw\\emph{', {noremap = false, silent = true})
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>sb', 'ysiw\\textbf{', {noremap = false, silent = true})
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>si', 'ysiw\\textit{', {noremap = false, silent = true})
+    
+    -- For visual mode
+    vim.api.nvim_buf_set_keymap(0, 'v', '<leader>se', 'S\\emph{', {noremap = false, silent = true})
+    vim.api.nvim_buf_set_keymap(0, 'v', '<leader>sb', 'S\\textbf{', {noremap = false, silent = true})
+    vim.api.nvim_buf_set_keymap(0, 'v', '<leader>si', 'S\\textit{', {noremap = false, silent = true})
+  end,
+})

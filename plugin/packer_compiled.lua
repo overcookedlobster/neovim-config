@@ -114,6 +114,11 @@ _G.packer_plugins = {
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/cmp_luasnip",
     url = "https://github.com/saadparwaiz1/cmp_luasnip"
   },
+  flexoki = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/flexoki",
+    url = "https://github.com/kepano/flexoki"
+  },
   fzf = {
     loaded = true,
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/fzf",
@@ -175,7 +180,7 @@ _G.packer_plugins = {
     url = "https://github.com/wbthomason/packer.nvim"
   },
   ["parrot.nvim"] = {
-    config = { "\27LJ\2\n©\4\0\0\b\0\22\0\0286\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\20\0005\3\17\0005\4\6\0006\5\3\0009\5\4\5'\a\5\0B\5\2\2=\5\a\0045\5\b\0005\6\t\0=\6\n\5=\5\v\0045\5\r\0005\6\f\0=\6\14\0055\6\15\0=\6\16\5=\5\n\4=\4\18\0034\4\0\0=\4\19\3=\3\21\2B\0\2\1K\0\1\0\14providers\1\0\2\14providers\0\18user_input_ui\vnative\vollama\14anthropic\1\0\2\vollama\0\14anthropic\0\fcommand\1\0\1\15max_tokens\3€ \tchat\1\0\2\fcommand\0\tchat\0\1\0\1\15max_tokens\3€ \ntopic\vparams\1\0\1\15max_tokens\3 \1\0\2\nmodel\28claude-3-haiku-20240307\vparams\0\fapi_key\1\0\5\17topic_promptKYou only respond with 3 to 4 words to summarize the past conversation.\vparams\0\ntopic\0\fapi_key\0\rendpoint*https://api.anthropic.com/v1/messages\22ANTHROPIC_API_KEY\vgetenv\aos\nsetup\vparrot\frequire\0" },
+    config = { "\27LJ\2\n©\4\0\0\b\0\22\0\0286\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\20\0005\3\17\0005\4\6\0006\5\3\0009\5\4\5'\a\5\0B\5\2\2=\5\a\0045\5\b\0005\6\t\0=\6\n\5=\5\v\0045\5\r\0005\6\f\0=\6\14\0055\6\15\0=\6\16\5=\5\n\4=\4\18\0034\4\0\0=\4\19\3=\3\21\2B\0\2\1K\0\1\0\14providers\1\0\2\18user_input_ui\vnative\14providers\0\vollama\14anthropic\1\0\2\14anthropic\0\vollama\0\fcommand\1\0\1\15max_tokens\3€ \tchat\1\0\2\tchat\0\fcommand\0\1\0\1\15max_tokens\3€ \ntopic\vparams\1\0\1\15max_tokens\3 \1\0\2\nmodel\28claude-3-haiku-20240307\vparams\0\fapi_key\1\0\5\rendpoint*https://api.anthropic.com/v1/messages\vparams\0\fapi_key\0\ntopic\0\17topic_promptKYou only respond with 3 to 4 words to summarize the past conversation.\22ANTHROPIC_API_KEY\vgetenv\aos\nsetup\vparrot\frequire\0" },
     loaded = true,
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/parrot.nvim",
     url = "https://github.com/frankroeder/parrot.nvim"
@@ -210,6 +215,11 @@ _G.packer_plugins = {
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/toast.vim",
     url = "https://github.com/jsit/toast.vim"
   },
+  ["tokyodark.nvim"] = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/tokyodark.nvim",
+    url = "https://github.com/tiagovla/tokyodark.nvim"
+  },
   ["trouble.nvim"] = {
     loaded = true,
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/trouble.nvim",
@@ -242,6 +252,11 @@ _G.packer_plugins = {
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/vim-sensible",
     url = "https://github.com/tpope/vim-sensible"
   },
+  ["vim-surround"] = {
+    loaded = true,
+    path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/vim-surround",
+    url = "https://github.com/tpope/vim-surround"
+  },
   yui = {
     loaded = true,
     path = "/home/flyinglobster/.local/share/nvim/site/pack/packer/start/yui",
@@ -257,7 +272,7 @@ _G.packer_plugins = {
 time([[Defining packer_plugins]], false)
 -- Config for: parrot.nvim
 time([[Config for parrot.nvim]], true)
-try_loadstring("\27LJ\2\n©\4\0\0\b\0\22\0\0286\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\20\0005\3\17\0005\4\6\0006\5\3\0009\5\4\5'\a\5\0B\5\2\2=\5\a\0045\5\b\0005\6\t\0=\6\n\5=\5\v\0045\5\r\0005\6\f\0=\6\14\0055\6\15\0=\6\16\5=\5\n\4=\4\18\0034\4\0\0=\4\19\3=\3\21\2B\0\2\1K\0\1\0\14providers\1\0\2\14providers\0\18user_input_ui\vnative\vollama\14anthropic\1\0\2\vollama\0\14anthropic\0\fcommand\1\0\1\15max_tokens\3€ \tchat\1\0\2\fcommand\0\tchat\0\1\0\1\15max_tokens\3€ \ntopic\vparams\1\0\1\15max_tokens\3 \1\0\2\nmodel\28claude-3-haiku-20240307\vparams\0\fapi_key\1\0\5\17topic_promptKYou only respond with 3 to 4 words to summarize the past conversation.\vparams\0\ntopic\0\fapi_key\0\rendpoint*https://api.anthropic.com/v1/messages\22ANTHROPIC_API_KEY\vgetenv\aos\nsetup\vparrot\frequire\0", "config", "parrot.nvim")
+try_loadstring("\27LJ\2\n©\4\0\0\b\0\22\0\0286\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\20\0005\3\17\0005\4\6\0006\5\3\0009\5\4\5'\a\5\0B\5\2\2=\5\a\0045\5\b\0005\6\t\0=\6\n\5=\5\v\0045\5\r\0005\6\f\0=\6\14\0055\6\15\0=\6\16\5=\5\n\4=\4\18\0034\4\0\0=\4\19\3=\3\21\2B\0\2\1K\0\1\0\14providers\1\0\2\18user_input_ui\vnative\14providers\0\vollama\14anthropic\1\0\2\14anthropic\0\vollama\0\fcommand\1\0\1\15max_tokens\3€ \tchat\1\0\2\tchat\0\fcommand\0\1\0\1\15max_tokens\3€ \ntopic\vparams\1\0\1\15max_tokens\3 \1\0\2\nmodel\28claude-3-haiku-20240307\vparams\0\fapi_key\1\0\5\rendpoint*https://api.anthropic.com/v1/messages\vparams\0\fapi_key\0\ntopic\0\17topic_promptKYou only respond with 3 to 4 words to summarize the past conversation.\22ANTHROPIC_API_KEY\vgetenv\aos\nsetup\vparrot\frequire\0", "config", "parrot.nvim")
 time([[Config for parrot.nvim]], false)
 vim.cmd [[augroup packer_load_aucmds]]
 vim.cmd [[au!]]

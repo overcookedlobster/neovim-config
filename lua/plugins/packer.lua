@@ -22,8 +22,10 @@ local packer_bootstrap = ensure_packer()
 return require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
   use 'InES-HPMM/zhaw-snippets'
+  use 'tpope/vim-surround'
   use 'tpope/vim-sensible'
   use 'junegunn/seoul256.vim'
+  use 'tiagovla/tokyodark.nvim'
   use {'xuhdev/vim-latex-live-preview', ft = 'tex'}
   use {'L3MON4D3/LuaSnip', tag = 'v2.*', run = 'make install_jsregexp'}
   use 'nvim-lua/plenary.nvim'
@@ -33,6 +35,7 @@ return require('packer').startup(function(use)
   use 'jakemason/ouroboros'
 
 -- Colors
+use 'kepano/flexoki'
   use 'Shatur/neovim-ayu'
   -- use 'morhetz/gruvbox'
   use 'sainnhe/gruvbox-material'
