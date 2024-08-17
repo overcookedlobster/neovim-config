@@ -15,10 +15,11 @@
 "xmap im <plug>(vimtex-i$)
 
 " A few examples of disabling default VimTeX features.
-let g:vimtex_indent_enabled   = 0      " turn off VimTeX indentation
+let g:vimtex_indent_enabled   = 1      " turn off VimTeX indentation
 let g:vimtex_imaps_enabled    = 0      " disable insert mode mappings (e.g. if you use UltiSnips)
-let g:vimtex_complete_enabled = 0      " turn off completion
+let g:vimtex_complete_enabled = 1      " turn off completion
 let g:vimtex_syntax_enabled   = 1      " disable syntax conceal
+let g:vimtex_root_patterns = ['main.tex', '.latexmain', 'access.tex']
 ""imap <silent><expr> <Tab> luasnip#expandable() ? '<Plug>luasnip-expand-snippet' : '<Tab>'
 
 " Jump forward

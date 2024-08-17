@@ -12,10 +12,17 @@ require('plugins.null-ls')
 require('plugins.trouble')
 require('plugins.markdown')
 require('plugins.luasnip')
+require('plugins.LuaSnip') -- Reload LuaSnip config
 require('plugins.nvim-cmp')
 require('plugins.Comment')
 require('personal.checklist_directory_generator').setup()
-
+-- In your init.lua
+require('personal.transient-notes').setup({
+    -- Optional: override default settings
+    width = 0.6,  -- 60% of screen width
+    height = 0.7, -- 70% of screen height
+    notes_dir = vim.fn.expand('~/Documents/my_notes/'),  -- Optional: change the notes directory
+})
 -- Load utilities
 require('utils').setup()
 -- Load colorscheme
@@ -115,23 +122,28 @@ vim.o.omnifunc = 'syntaxcomplete#Complete'
  --     vim.bo.omnifunc = 'syntaxcomplete#Complete'
  --   end,
  -- })
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "tex",
-  callback = function()
-    -- Use vim-surround to delete surroundings
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d(', 'ds(', {noremap = false, silent = true})
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d[', 'ds[', {noremap = false, silent = true})
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d{', 'ds{', {noremap = false, silent = true})
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d"', 'ds"', {noremap = false, silent = true})
-    
-    -- Add LaTeX-specific surroundings
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>se', 'ysiw\\emph{', {noremap = false, silent = true})
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>sb', 'ysiw\\textbf{', {noremap = false, silent = true})
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>si', 'ysiw\\textit{', {noremap = false, silent = true})
-    
-    -- For visual mode
-    vim.api.nvim_buf_set_keymap(0, 'v', '<leader>se', 'S\\emph{', {noremap = false, silent = true})
-    vim.api.nvim_buf_set_keymap(0, 'v', '<leader>sb', 'S\\textbf{', {noremap = false, silent = true})
-    vim.api.nvim_buf_set_keymap(0, 'v', '<leader>si', 'S\\textit{', {noremap = false, silent = true})
-  end,
-})
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = "tex",
+--   callback = function()
+--     -- Use vim-surround to delete surroundings
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d(', 'ds(', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d[', 'ds[', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d{', 'ds{', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>d"', 'ds"', {noremap = false, silent = true})
+--     
+--     -- Use vim-surround to delete surroundings
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>c(', 'cs(', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>c[', 'cs[', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>c{', 'cs{', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>c"', 'cs"', {noremap = false, silent = true})
+--     -- Add LaTeX-specific surroundings
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>se', 'ysiw\\emph{', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>sb', 'ysiw\\textbf{', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'n', '<leader>si', 'ysiw\\textit{', {noremap = false, silent = true})
+--     
+--     -- For visual mode
+--     vim.api.nvim_buf_set_keymap(0, 'v', '<leader>se', 'S\\emph{', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'v', '<leader>sb', 'S\\textbf{', {noremap = false, silent = true})
+--     vim.api.nvim_buf_set_keymap(0, 'v', '<leader>si', 'S\\textit{', {noremap = false, silent = true})
+--   end,
+-- })

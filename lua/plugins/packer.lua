@@ -22,6 +22,8 @@ local packer_bootstrap = ensure_packer()
 return require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
   use 'InES-HPMM/zhaw-snippets'
+  use 'yuratomo/w3m.vim'
+  use 'mg979/vim-visual-multi'
   use 'tpope/vim-surround'
   use 'tpope/vim-sensible'
   use 'junegunn/seoul256.vim'
