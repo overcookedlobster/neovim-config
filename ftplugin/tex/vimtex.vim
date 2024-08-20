@@ -6,6 +6,9 @@ if exists("b:did_myvimtexsettings")
 endif
 if !exists('g:vimtex_compiler_latexmk')
   let g:vimtex_compiler_latexmk = {}
+  let g:vimtex_compiler_latexmk.build_dir = ''
+  let g:vimtex_compiler_latexmk.options += ['-shell-escape']
+  let g:vimtex_compiler_method = 'latexmk'
 endif
 if !has_key(g:vimtex_compiler_latexmk, 'options')
   let g:vimtex_compiler_latexmk.options = [

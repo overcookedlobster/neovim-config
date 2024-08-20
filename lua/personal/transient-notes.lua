@@ -5,12 +5,14 @@ local M = {}
 M.config = {
     persistent_buffer_name = "PersistentNotes",
     temporary_buffer_name = "TemporaryNotes",
+    random_buffer_name = "RandomNotes",
     file_type = "markdown",
     auto_save = true,
     auto_save_interval = 300, -- 5 minutes
     width = 0.5,  -- 50% of screen width
     height = 0.5, -- 50% of screen height
     notes_dir = vim.fn.expand('~/.local/share/nvim/transient_notes/'), -- Default directory for notes
+    random_notes_dir = vim.fn.stdpath('data') .. '/random_notes/', -- Directory for random notes
 }
 
 local function center(str)
@@ -49,6 +51,60 @@ function M.load_persisted_content()
     return nil
 end
 
+-- New function for random notes
+function M.open_random_note()
+    local random_note_path = M.config.random_notes_dir .. os.date("%Y%m%d%H%M%S") .. ".md"
+    
+    -- Ensure the random notes directory exists
+    vim.fn.mkdir(M.config.random_notes_dir, "p")
+    
+    -- Create a new buffer for the random note
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_name(buf, random_note_path)
+    vim.api.nvim_buf_set_option(buf, 'filetype', M.config.file_type)
+    
+    -- Calculate dimensions
+    local width = math.floor(vim.o.columns * M.config.width)
+    local height = math.floor(vim.o.lines * M.config.height)
+    local col = math.floor((vim.o.columns - width) / 2)
+    local row = math.floor((vim.o.lines - height) / 2)
+
+    -- Open the buffer in a popup window
+    local win = vim.api.nvim_open_win(buf, true, {
+        relative = 'editor',
+        width = width,
+        height = height,
+        col = col,
+        row = row,
+        style = 'minimal',
+        border = 'rounded'
+    })
+
+    -- Set window options
+    vim.api.nvim_win_set_option(win, 'winblend', 15)
+    vim.api.nvim_win_set_option(win, 'cursorline', true)
+
+    -- Set buffer options
+    vim.api.nvim_buf_set_option(buf, 'modifiable', true)
+    vim.api.nvim_buf_set_option(buf, 'buftype', '')  -- Allow saving
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'hide')
+
+    -- Add a title and timestamp
+    local title = center("Random Note")
+    local timestamp = right_justify(os.date("%Y-%m-%d %H:%M:%S"))
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {title, timestamp, "", ""})
+    vim.api.nvim_buf_add_highlight(buf, -1, 'Title', 0, 0, -1)
+    vim.api.nvim_buf_add_highlight(buf, -1, 'Comment', 1, 0, -1)
+
+    -- Set up autocommand to save the random note on buffer write
+    vim.cmd(string.format([[
+        augroup RandomNoteSave
+            autocmd!
+            autocmd BufWritePost <buffer=%d> silent! write %s
+        augroup END
+    ]], buf, random_note_path))
+end
+
 -- Save the persistent buffer content to a file
 function M.save_persistent_buffer()
     local buf = vim.fn.bufnr(M.config.persistent_buffer_name)
@@ -60,7 +116,7 @@ function M.save_persistent_buffer()
             file:write(table.concat(lines, "\n"))
             file:close()
             print("Persistent notes saved to " .. file_path)
-        else
+        -- else
             print("Error: Could not save persistent notes.")
         end
     end
@@ -126,6 +182,21 @@ function M.open_notes_buffer(persistent)
         vim.api.nvim_buf_add_highlight(buf, -1, 'Comment', 1, 0, -1)
         vim.api.nvim_buf_add_highlight(buf, -1, 'Comment', 2, 0, -1)
     end
+end
+
+-- New function to grep random notes using Telescope
+function M.grep_random_notes()
+    local ok, telescope = pcall(require, 'telescope.builtin')
+    if not ok then
+        vim.notify("Telescope is not installed. Please install telescope.nvim to use this feature.", vim.log.levels.ERROR)
+        return
+    end
+
+    telescope.live_grep({
+        prompt_title = "Search Random Notes",
+        search_dirs = {M.config.random_notes_dir},
+        path_display = {"smart"},
+    })
 end
 
 -- Global search functionality
@@ -195,18 +266,26 @@ function M.copy_to_clipboard()
 end
 
 function M.setup(opts)
+
     M.config = vim.tbl_deep_extend("force", M.config, opts or {})
     
-    -- Ensure the notes directory exists
+    -- Ensure the notes directories exist
     vim.fn.mkdir(M.config.notes_dir, "p")
+    vim.fn.mkdir(M.config.random_notes_dir, "p")
+
+    -- Print the paths for verification
+    -- print("Persistent notes directory: " .. M.config.notes_dir)
+    -- print("Random notes directory: " .. M.config.random_notes_dir)
 
     -- Create commands using vim.cmd
     vim.cmd([[
         command! PersistentNotes lua require('personal.transient-notes').open_notes_buffer(true)
         command! TemporaryNotes lua require('personal.transient-notes').open_notes_buffer(false)
+        command! RandomNote lua require('personal.transient-notes').open_random_note()
         command! SavePersistentNotes lua require('personal.transient-notes').save_persistent_buffer()
         command! SearchNotes lua require('personal.transient-notes').global_search_notes()
         command! CopyNotesToClipboard lua require('personal.transient-notes').copy_to_clipboard()
+        command! GrepRandomNotes lua require('personal.transient-notes').grep_random_notes()
     ]])
     
     -- Set up auto-save for persistent notes if enabled
@@ -219,9 +298,11 @@ function M.setup(opts)
     -- Set up keybindings
     vim.api.nvim_set_keymap('n', '<leader>pn', ':PersistentNotes<CR>', {noremap = true, silent = true})
     vim.api.nvim_set_keymap('n', '<leader>tn', ':TemporaryNotes<CR>', {noremap = true, silent = true})
+    vim.api.nvim_set_keymap('n', '<leader>rn', ':RandomNote<CR>', {noremap = true, silent = true})
     vim.api.nvim_set_keymap('n', '<leader>ns', ':SearchNotes<CR>', {noremap = true, silent = true})
     vim.api.nvim_set_keymap('n', '<leader>nc', ':CopyNotesToClipboard<CR>', {noremap = true, silent = true})
     vim.api.nvim_set_keymap('v', '<leader>nc', ':CopyNotesToClipboard<CR>', {noremap = true, silent = true})
+    vim.api.nvim_set_keymap('n', '<leader>ng', ':GrepRandomNotes<CR>', {noremap = true, silent = true})
 
     -- Enable syntax highlighting for markdown in the notes buffers
     vim.cmd([[

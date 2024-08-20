@@ -12,6 +12,9 @@ telescope.setup{
   pickers = {
     find_files = {
       theme = "dropdown",
+      layout_config = {
+        width = 0.9, -- 90% of screen width
+      },
     }
   },
   extensions = {

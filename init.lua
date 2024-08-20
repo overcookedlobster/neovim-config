@@ -31,6 +31,7 @@ require('ayu').setup({
     terminal = true, -- Set to `false` to let terminal manage its own colors.
     overrides = {}, -- A dictionary of group names, each associated with a dictionary of parameters (`bg`, `fg`, `sp` and `style`) and colors in hex.
 })
+vim.opt.hlsearch = true
 -- vim.opt.background = "dark"
 -- vim.cmd('colorscheme gruvbox')
 vim.o.background = "dark" vim.g.gruvbox_material_background = "soft"
