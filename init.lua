@@ -1,3 +1,57 @@
+-- Automatically install packer if not installed
+local ensure_packer = function()
+  local fn = vim.fn
+  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+  if fn.empty(fn.glob(install_path)) > 0 then
+    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+    vim.cmd [[packadd packer.nvim]]
+    return true
+  end
+  return false
+end
+print(vim.inspect(vim.g.jukit_config_path))
+
+-- Set Python provider
+vim.g.python3_host_prog = '/usr/bin/python3'  -- Adjust path as needed
+local packer_bootstrap = ensure_packer()
+-- Add this to your init.lua
+vim.g.jukit_config_path = vim.fn.stdpath('config') .. '/jukit_config.json'
+-- Enable vim-jukit debug mode
+vim.g.jukit_debug = 2
+vim.g.jukit_shell_cmd = 'ipython3'
+vim.g.jukit_terminal = 'nvimterm'
+vim.g.jukit_auto_output_hist = 1
+
+
+
+
+-- Autocommand to reload Neovim whenever you save the plugins.lua file
+vim.cmd([[
+  augroup packer_user_config
+    autocmd!
+    autocmd BufWritePost plugins.lua source <afile> | PackerSync
+  augroup end
+]])
+
+-- Use packer to manage itself and install plugins
+require('packer').startup(function(use)
+  use 'wbthomason/packer.nvim' -- Packer can manage itself
+  -- Install Telescope
+  use {
+    'nvim-telescope/telescope.nvim',
+    requires = { {'nvim-lua/plenary.nvim'} }
+  }
+  -- Add your plugins here, e.g.:
+  -- use 'tpope/vim-surround'
+  -- use 'nvim-treesitter/nvim-treesitter'
+
+  -- Automatically set up your configuration after cloning packer.nvim
+  -- Keep this at the end of your plugin list
+  if packer_bootstrap then
+    require('packer').sync()
+  end
+end)
+
 -- Load core options
 require('core.options')
 require('core.keymaps')

@@ -93,7 +93,12 @@ use 'kepano/flexoki'
     end,
     }
 
-  use 'luk400/vim-jukit'
+use {
+  'luk400/vim-jukit',
+  config = function()
+    -- Any additional vim-jukit setup can go here
+  end
+}
   use {'junegunn/fzf', run = function() vim.fn['fzf#install']() end}
   use {'ibhagwan/fzf-lua', branch = 'main'}
   use 'nvim-tree/nvim-web-devicons'
