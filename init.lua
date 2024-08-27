@@ -202,3 +202,12 @@ vim.o.omnifunc = 'syntaxcomplete#Complete'
 --     vim.api.nvim_buf_set_keymap(0, 'v', '<leader>si', 'S\\textit{', {noremap = false, silent = true})
 --   end,
 -- })
+if vim.fn.has('nvim-0.7') == 0 then
+  vim.api.nvim_err_writeln('concat_files requires at least nvim-0.7')
+  return
+end
+
+-- Create a command to use the function
+vim.api.nvim_create_user_command('ConcatFiles', function(opts)
+  require('personal/concat_files').concat_files(opts.args)
+end, {nargs = '*'})
