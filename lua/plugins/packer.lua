@@ -20,6 +20,7 @@ end
 local packer_bootstrap = ensure_packer()
 
 return require('packer').startup(function(use)
+  use {'lervag/vimtex'}
   use 'wbthomason/packer.nvim'
   use 'InES-HPMM/zhaw-snippets'
   use 'yuratomo/w3m.vim'

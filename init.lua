@@ -211,3 +211,8 @@ end
 vim.api.nvim_create_user_command('ConcatFiles', function(opts)
   require('personal/concat_files').concat_files(opts.args)
 end, {nargs = '*'})
+vim.api.nvim_set_keymap('n', '<leader>ym', [[:redir @+ | :message | :redir END<CR>]], { noremap = true, silent = true })
+
+vim.g.python3_host_prog = '/usr/bin/python3'
+vim.opt.verbosefile = "/tmp/nvim.log"
+vim.opt.verbose = 2
