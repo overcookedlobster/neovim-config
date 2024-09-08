@@ -1,0 +1,210 @@
+-- use {
+--   'frankroeder/parrot.nvim',
+--   tag = "v0.4.2",
+--   dependencies = { 'ibhagwan/fzf-lua', 'nvim-lua/plenary.nvim' },
+--   config = function()
+--     local Path = require("plenary.path")
+--     local scan = require("plenary.scandir")
+--     local yaml = require("yaml") -- Make sure to install lua-yaml
+--
+--     local parrot = require("parrot")
+--     parrot.setup {
+--       providers = {
+--         anthropic = {
+--           api_key = os.getenv "ANTHROPIC_API_KEY",
+--           endpoint = "https://api.anthropic.com/v1/messages",
+--           topic_prompt = "You only respond with 3 to 4 words to summarize the past conversation.",
+--           topic = {
+--             model = "claude-3-haiku-20240307",
+--             params = { max_tokens = 32 },
+--           },
+--           params = {
+--             chat = { max_tokens = 4096 },
+--             command = { max_tokens = 4096 },
+--           },
+--         },
+--         ollama = {} -- provide an empty list to make provider available
+--       },
+--       user_input_ui = "native",
+--       hooks = {
+--         ProcessLargeDataset = function(prt, params)
+--           -- The entire hook function goes here
+--           -- (The long function we developed earlier)
+--           local args = vim.split(params.args or "", " ")
+--           local input_path, output_path, depth, exclude = nil, nil, 1, {}
+--           
+--           -- ... (rest of the function)
+--                   for i, arg in ipairs(args) do
+--                     if arg == "-i" and args[i+1] then
+--                       input_path = args[i+1]
+--                     elseif arg == "-o" and args[i+1] then
+--                       output_path = args[i+1]
+--                     elseif arg == "-d" and args[i+1] then
+--                       depth = tonumber(args[i+1]) or 1
+--                     elseif arg == "-e" and args[i+1] then
+--                       table.insert(exclude, args[i+1])
+--                     end
+--                   end
+--                   
+--                   -- Set default paths relative to current buffer
+--                   local current_dir = vim.fn.expand("%:p:h")
+--                   input_path = input_path or (current_dir .. "/input")
+--                   output_path = output_path or (current_dir .. "/output")
+--                   
+--                   -- Create output directory if it doesn't exist
+--                   vim.fn.mkdir(output_path, "p")
+--                   
+--                   -- Get YAML formatting preferences
+--                   local yaml_format = prt.ui.input({
+--                     prompt = "Enter YAML formatting preferences (e.g., indent: 2, line_width: 80):",
+--                     default = "indent: 2, line_width: 80"
+--                   })
+--                   local yaml_opts = load("return {" .. yaml_format .. "}")()
+--                   
+--                   -- Function to process a single file
+--                   local function process_file(file_path)
+--                     local input_file = io.open(file_path, "r")
+--                     if not input_file then
+--                       prt.logger.error("Failed to open input file: " .. file_path)
+--                       return
+--                     end
+--                     
+--                     local content = input_file:read("*all")
+--                     input_file:close()
+--                     
+--                     local output_file_path = Path:new(output_path, Path:new(file_path):make_relative(input_path)):with_suffix(".yaml")
+--                     local output_file = io.open(output_file_path, "a+")
+--                     if not output_file then
+--                       prt.logger.error("Failed to open output file: " .. output_file_path)
+--                       return
+--                     end
+--                     
+--                     -- Check if file already has content and position at the end
+--                     output_file:seek("end")
+--                     local file_size = output_file:seek()
+--                     local continuation = file_size > 0
+--                     
+--                     local function process_chunk(chunk, is_continuation)
+--                       local template = [[
+--                         Process the following content and produce a YAML output.
+--                         If this is a continuation, ensure proper indentation and structure.
+--                         Add explanations as comments starting with '#'.
+--                         Be concise and focus on accuracy.
+--                         Content:
+--                         {{content}}
+--                         
+--                         Produce YAML output below. End with "# EOF" on a new line when complete:
+--                       ]]
+--                       
+--                       if is_continuation then
+--                         template = "Continue processing where you left off, maintaining proper YAML structure:\n" .. template
+--                       end
+--                       
+--                       local model_obj = prt.get_model("command")
+--                       local result = prt.Command(chunk, model_obj, template)
+--                       
+--                       -- Check if EOF was reached
+--                       if string.match(result, "# EOF\n$") then
+--                         return result:gsub("# EOF\n$", ""), true
+--                       else
+--                         return result, false
+--                       end
+--                     end
+--                     
+--                     local is_complete = false
+--                     local processed_content = ""
+--                     while not is_complete do
+--                       local chunk, complete = process_chunk(content, continuation)
+--                       processed_content = processed_content .. chunk
+--                       is_complete = complete
+--                       continuation = true
+--                       
+--                       if not is_complete then
+--                         prt.logger.info("Output incomplete for " .. file_path .. ". Continuing...")
+--                         vim.loop.sleep(60000)  -- Wait 1 minute to respect rate limits
+--                       end
+--                     end
+--                     
+--                     -- Validate and format YAML
+--                     local success, parsed_yaml = pcall(yaml.load, processed_content)
+--                     if not success then
+--                       prt.logger.error("Invalid YAML produced for " .. file_path)
+--                       return
+--                     end
+--                     
+--                     local formatted_yaml = yaml.dump(parsed_yaml, yaml_opts)
+--                     output_file:write(formatted_yaml)
+--                     output_file:close()
+--                     prt.logger.info("Processed " .. file_path .. " and saved to " .. output_file_path)
+--                   end
+--                   
+--                   -- Function to get list of files to process
+--                   local function get_files_to_process()
+--                     local files = {}
+--                     if input_path:match("/%*$") then
+--                       -- If input_path ends with /*, it's a directory
+--                       input_path = input_path:sub(1, -2)  -- Remove *
+--                       files = scan.scan_dir(input_path, {depth = depth, add_dirs = false})
+--                     elseif vim.fn.filereadable(input_path) == 1 then
+--                       -- If input_path is a file
+--                       files = {input_path}
+--                     else
+--                       -- Default: all files in input_path directory
+--                       files = scan.scan_dir(input_path, {depth = depth, add_dirs = false})
+--                     end
+--                     
+--                     -- Filter out excluded files and .git folders
+--                     return vim.tbl_filter(function(file)
+--                       local relative_path = Path:new(file):make_relative(input_path)
+--                       return not vim.tbl_contains(exclude, relative_path) and not relative_path:match("^%.git/")
+--                     end, files)
+--                   end
+--                   
+--                   local files = get_files_to_process()
+--                   local total_files = #files
+--                   local processed_files = 0
+--                   
+--                   -- Create progress bar popup
+--                   local progress_win, progress_buf
+--                   local function update_progress()
+--                     if not progress_win or not vim.api.nvim_win_is_valid(progress_win) then
+--                       progress_buf = vim.api.nvim_create_buf(false, true)
+--                       local width = 60
+--                       local height = 3
+--                       local win_opts = {
+--                         relative = "editor",
+--                         width = width,
+--                         height = height,
+--                         row = (vim.o.lines - height) / 2,
+--                         col = (vim.o.columns - width) / 2,
+--                         style = "minimal",
+--                         border = "rounded"
+--                       }
+--                       progress_win = vim.api.nvim_open_win(progress_buf, false, win_opts)
+--                     end
+--                     
+--                     local percentage = math.floor((processed_files / total_files) * 100)
+--                     local progress_bar = string.rep("█", percentage / 2) .. string.rep("░", 50 - (percentage / 2))
+--                     local progress_text = string.format("Processing: [%s] %d%%", progress_bar, percentage)
+--                     vim.api.nvim_buf_set_lines(progress_buf, 0, -1, false, {progress_text})
+--                   end
+--                   
+--                   for _, file in ipairs(files) do
+--                     process_file(file)
+--                     processed_files = processed_files + 1
+--                     update_progress()
+--                   end
+--                   
+--                   -- Close progress bar
+--                   if progress_win and vim.api.nvim_win_is_valid(progress_win) then
+--                     vim.api.nvim_win_close(progress_win, true)
+--                   end
+--                   
+--                   prt.logger.info("All files processed.")
+--
+--         end,
+--       },
+--     }
+--   end,
+-- }
+--
