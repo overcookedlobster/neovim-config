@@ -217,12 +217,13 @@ vim.api.nvim_set_keymap('n', '<leader>ym', [[:redir @+ | :message | :redir END<C
 vim.g.python3_host_prog = '/usr/bin/python3'
 vim.opt.verbosefile = "/tmp/nvim.log"
 vim.opt.verbose = 2
-print("Attempting to load personal.beamer_folder")
+-- print("Attempting to load personal.beamer_folder")
 local ok, beamer_folder = pcall(require, "personal.beamer_folder")
 if ok then
-    print("personal.beamer_folder loaded successfully")
+    -- print("personal.beamer_folder loaded successfully")
     beamer_folder.setup()
-    print("personal.beamer_folder setup complete")
-else
-    print("Error loading personal.beamer_folder module: " .. tostring(beamer_folder))
+    -- print("personal.beamer_folder setup complete")
+-- else
+    -- print("Error loading personal.beamer_folder module: " .. tostring(beamer_folder))
 end
+vim.api.nvim_set_keymap('n', '<leader>pr', ':PrtChatResponde<CR>', { noremap = true, silent = true })
