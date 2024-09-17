@@ -19,7 +19,7 @@ vim.g.jukit_config_path = vim.fn.stdpath('config') .. '/jukit_config.json'
 -- Enable vim-jukit debug mode
 vim.g.jukit_debug = 2
 vim.g.jukit_shell_cmd = 'ipython3'
-vim.g.jukit_terminal = 'kitty'
+vim.g.jukit_terminal = 'nvimterm'
 vim.g.jukit_auto_output_hist = 1
 vim.g.jukit_use_tcomment = 1
 
