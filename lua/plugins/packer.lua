@@ -214,102 +214,73 @@ ProcessLargeDataset = function(prt, params)
     local file_size = output_file:seek()
     local continuation = file_size > 0
     
-    local function process_chunk(chunk, is_continuation)
-      vim.notify("Processing chunk, continuation: " .. tostring(is_continuation), vim.log.levels.DEBUG)
-      
-      local template = [[
-        Process the following content and produce a YAML output. 
-        If this is a continuation, append to the existing structure.
-        Content:
-        {{content}}
-        
-        Produce YAML output below. End with "# EOF" on a new line when complete:
-      ]]
-      
-      if is_continuation then
-        template = "Continue processing where you left off:\n" .. template
-      end
-      
-      local model_obj = prt.get_model("command")
-      if not model_obj then
-        vim.notify("Failed to get command model", vim.log.levels.ERROR)
-        return nil, true
-      end
-      
-      vim.notify("Calling prt.Prompt", vim.log.levels.DEBUG)
-      if type(prt.Prompt) ~= "function" then
-        vim.notify("Error: prt.Prompt is not a function. Type: " .. type(prt.Prompt), vim.log.levels.ERROR)
-        return nil, true
-      end
+local function process_chunk(chunk, is_continuation)
+  vim.notify("Processing chunk, continuation: " .. tostring(is_continuation), vim.log.levels.DEBUG)
+  
+  local template = [[
+    Process the following content and produce a YAML output. 
+    If this is a continuation, append to the existing structure.
+    Content:
+    {{content}}
+    
+    Produce YAML output below. End with "# EOF" on a new line when complete:
+  ]]
+  
+  if is_continuation then
+    template = "Continue processing where you left off:\n" .. template
+  end
+  
+  local model_obj = prt.get_model("command")
+  if not model_obj then
+    vim.notify("Failed to get command model", vim.log.levels.ERROR)
+    return nil, true
+  end
+  
+  vim.notify("Calling prt.Prompt", vim.log.levels.DEBUG)
+  if type(prt.Prompt) ~= "function" then
+    vim.notify("Error: prt.Prompt is not a function. Type: " .. type(prt.Prompt), vim.log.levels.ERROR)
+    return nil, true
+  end
 
-      local success, result = pcall(prt.Prompt, {args = chunk}, prt.ui.Target.popup, model_obj, nil, template)
-      if not success then
-        vim.notify("Error in prt.Prompt: " .. tostring(result), vim.log.levels.ERROR)
-        return nil, true
-      end
+  local success, result = pcall(prt.Prompt, {args = chunk}, prt.ui.Target.popup, model_obj, nil, template)
+  if not success then
+    vim.notify("Error in prt.Prompt: " .. tostring(result), vim.log.levels.ERROR)
+    return nil, true
+  end
 
-      if result == nil then
-        vim.notify("prt.Prompt returned nil, attempting fallback processing", vim.log.levels.WARN)
-        -- Fallback: attempt to convert the chunk to YAML directly
-        local yaml_result = yaml.dump(chunk)
-        if yaml_result then
-          return yaml_result .. "\n# EOF\n", true
-        else
-          vim.notify("Fallback processing failed", vim.log.levels.ERROR)
-          return nil, true
-        end
-      end
-
-      if type(result) ~= "string" then
-        vim.notify("prt.Prompt returned non-string result: " .. vim.inspect(result), vim.log.levels.ERROR)
-        return nil, true
-      end
-
-      if result:match("# EOF\n$") then
-        return result:gsub("# EOF\n$", ""), true
+  if result == nil then
+    vim.notify("prt.Prompt returned nil, attempting fallback processing", vim.log.levels.WARN)
+    -- Fallback: attempt to convert the chunk to YAML directly
+    local yaml_result
+    pcall(function()
+      -- Attempt to parse the chunk as Lua table
+      local chunk_table = load("return " .. chunk)()
+      if type(chunk_table) == "table" then
+        yaml_result = yaml.dump(chunk_table)
       else
-        return result, false
+        -- If not a table, create a simple key-value pair
+        yaml_result = yaml.dump({content = chunk})
       end
+    end)
+    if yaml_result then
+      return yaml_result .. "\n# EOF\n", true
+    else
+      vim.notify("Fallback processing failed", vim.log.levels.ERROR)
+      return nil, true
     end
+  end
 
-    local is_complete = false
-    local iteration = 0
-    while not is_complete and iteration < 5 do -- Added a maximum iteration limit
-      iteration = iteration + 1
-      vim.notify("Processing iteration " .. iteration .. " for file: " .. file_path, vim.log.levels.DEBUG)
-      
-      local chunk, complete = process_chunk(content, continuation)
-      
-      if not chunk then
-        vim.notify("Failed to process chunk for file: " .. file_path .. " (iteration " .. iteration .. ")", vim.log.levels.ERROR)
-        if iteration == 5 then
-          vim.notify("Max iterations reached, writing original content", vim.log.levels.WARN)
-          chunk = content
-          complete = true
-        else
-          vim.loop.sleep(1000) -- Wait before retrying
-          goto continue
-        end
-      end
-      
-      -- If continuation, start a new line before appending
-      if continuation then
-        output_file:write("\n")
-      end
-      
-      -- Write the chunk (processed or original) to the output file
-      output_file:write(chunk)
-      output_file:flush()  -- Ensure the content is written to the file
-      is_complete = complete
-      continuation = true
-      
-      if not is_complete then
-        vim.notify("Output incomplete for " .. file_path .. ". Continuing... (iteration " .. iteration .. ")", vim.log.levels.INFO)
-        vim.loop.sleep(1000)  -- Avoid rate limiting
-      end
-      
-      ::continue::
-    end
+  if type(result) ~= "string" then
+    vim.notify("prt.Prompt returned non-string result: " .. vim.inspect(result), vim.log.levels.ERROR)
+    return nil, true
+  end
+
+  if result:match("# EOF\n$") then
+    return result:gsub("# EOF\n$", ""), true
+  else
+    return result, false
+  end
+end
 
     output_file:close()
     vim.notify("Processed " .. file_path .. " and saved to " .. tostring(output_file_path), vim.log.levels.INFO)
