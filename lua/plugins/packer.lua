@@ -214,72 +214,64 @@ ProcessLargeDataset = function(prt, params)
     local file_size = output_file:seek()
     local continuation = file_size > 0
     
+  -- Add this new section for YAML structure prompt
+  local yaml_structure = params.yaml_structure or vim.fn.input("Enter desired YAML structure (e.g., summary, details, etc.): ")
+  if yaml_structure == "" then
+    vim.notify("No YAML structure provided. Using default structure.", vim.log.levels.WARN)
+    yaml_structure = "content"
+  end
+
+  -- Replace the existing process_chunk function with this updated version
 local function process_chunk(chunk, is_continuation)
   vim.notify("Processing chunk, continuation: " .. tostring(is_continuation), vim.log.levels.DEBUG)
   
-  local template = [[
-    Process the following content and produce a YAML output. 
-    If this is a continuation, append to the existing structure.
-    Content:
-    {{content}}
-    
-    Produce YAML output below. End with "# EOF" on a new line when complete:
-  ]]
-  
-  if is_continuation then
-    template = "Continue processing where you left off:\n" .. template
-  end
-  
-  local model_obj = prt.get_model("command")
-  if not model_obj then
-    vim.notify("Failed to get command model", vim.log.levels.ERROR)
-    return nil, true
-  end
-  
-  vim.notify("Calling prt.Prompt", vim.log.levels.DEBUG)
-  if type(prt.Prompt) ~= "function" then
-    vim.notify("Error: prt.Prompt is not a function. Type: " .. type(prt.Prompt), vim.log.levels.ERROR)
-    return nil, true
-  end
-
+  -- Attempt AI processing (keeping this for future use if AI becomes available)
   local success, result = pcall(prt.Prompt, {args = chunk}, prt.ui.Target.popup, model_obj, nil, template)
-  if not success then
-    vim.notify("Error in prt.Prompt: " .. tostring(result), vim.log.levels.ERROR)
-    return nil, true
+  
+  -- If AI processing fails or returns nil/empty, use fallback processing
+  if not success or not result or result == "" then
+    vim.notify("AI processing failed or returned empty result, using fallback processing", vim.log.levels.WARN)
+    
+    -- Fallback: create a simple YAML structure
+    local yaml_result = "summary:\n"
+    local lines = {}
+    for line in chunk:gmatch("[^\r\n]+") do
+      table.insert(lines, line)
+    end
+    
+    -- Combine repeated lines
+    local current_line = ""
+    local count = 0
+    for _, line in ipairs(lines) do
+      if line == current_line then
+        count = count + 1
+      else
+        if count > 0 then
+          yaml_result = yaml_result .. string.format("  - %s (repeated %d times)\n", current_line, count + 1)
+        end
+        current_line = line
+        count = 0
+      end
+    end
+    if count > 0 then
+      yaml_result = yaml_result .. string.format("  - %s (repeated %d times)\n", current_line, count + 1)
+    end
+    
+    return yaml_result .. "\n# EOF\n", true
   end
 
-  if result == nil then
-    vim.notify("prt.Prompt returned nil, attempting fallback processing", vim.log.levels.WARN)
-    -- Fallback: attempt to convert the chunk to YAML directly
-    local yaml_result
-    pcall(function()
-      -- Attempt to parse the chunk as Lua table
-      local chunk_table = load("return " .. chunk)()
-      if type(chunk_table) == "table" then
-        yaml_result = yaml.dump(chunk_table)
-      else
-        -- If not a table, create a simple key-value pair
-        yaml_result = yaml.dump({content = chunk})
-      end
-    end)
-    if yaml_result then
-      return yaml_result .. "\n# EOF\n", true
+  -- If we somehow get here with a valid result from AI, use it
+  if type(result) == "string" then
+    if result:match("# EOF\n$") then
+      return result:gsub("# EOF\n$", ""), true
     else
-      vim.notify("Fallback processing failed", vim.log.levels.ERROR)
-      return nil, true
+      return result, false
     end
   end
 
-  if type(result) ~= "string" then
-    vim.notify("prt.Prompt returned non-string result: " .. vim.inspect(result), vim.log.levels.ERROR)
-    return nil, true
-  end
-
-  if result:match("# EOF\n$") then
-    return result:gsub("# EOF\n$", ""), true
-  else
-    return result, false
-  end
+  -- If we get here, something unexpected happened
+  vim.notify("Unexpected result from processing", vim.log.levels.ERROR)
+  return nil, true
 end
 
     output_file:close()
