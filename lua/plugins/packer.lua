@@ -82,268 +82,268 @@ use {-- {{{
       },
       user_input_ui = "native",
       hooks = {
-ProcessLargeDataset = function(prt, params)
-  vim.notify("Starting ProcessLargeDataset hook", vim.log.levels.INFO)
-  
-  local Path = require("plenary.path")
-  if not Path then
-    vim.notify("Failed to load plenary.path module", vim.log.levels.ERROR)
-    return
-  end
-  vim.notify("Plenary Path module loaded successfully", vim.log.levels.INFO)
-  
-  local yaml_ok, yaml = pcall(require, "yaml")
-  if not yaml_ok then
-    vim.notify("Error: lua-yaml is required for ProcessLargeDataset", vim.log.levels.ERROR)
-    return
-  end
+            ProcessLargeDataset = function(prt, params)-- {{{
+              vim.notify("Starting ProcessLargeDataset hook", vim.log.levels.INFO)
+              
+              local Path = require("plenary.path")
+              if not Path then
+                vim.notify("Failed to load plenary.path module", vim.log.levels.ERROR)
+                return
+              end
+              vim.notify("Plenary Path module loaded successfully", vim.log.levels.INFO)
+              
+              local yaml_ok, yaml = pcall(require, "yaml")
+              if not yaml_ok then
+                vim.notify("Error: lua-yaml is required for ProcessLargeDataset", vim.log.levels.ERROR)
+                return
+              end
 
-  local args = vim.split(params.args or "", " ")
-  local input_path, output_path, depth, exclude = nil, nil, 1, {}
-  
-  for i, arg in ipairs(args) do
-    if arg == "-i" and args[i+1] then
-      input_path = args[i+1]
-    elseif arg == "-o" and args[i+1] then
-      output_path = args[i+1]
-    elseif arg == "-d" and args[i+1] then
-      depth = tonumber(args[i+1]) or 1
-    elseif arg == "-e" and args[i+1] then
-      table.insert(exclude, args[i+1])
-    end
-  end
+              local args = vim.split(params.args or "", " ")
+              local input_path, output_path, depth, exclude = nil, nil, 1, {}
+              
+              for i, arg in ipairs(args) do
+                if arg == "-i" and args[i+1] then
+                  input_path = args[i+1]
+                elseif arg == "-o" and args[i+1] then
+                  output_path = args[i+1]
+                elseif arg == "-d" and args[i+1] then
+                  depth = tonumber(args[i+1]) or 1
+                elseif arg == "-e" and args[i+1] then
+                  table.insert(exclude, args[i+1])
+                end
+              end
 
-  vim.notify("Parsed args: input=" .. tostring(input_path) .. ", output=" .. tostring(output_path) .. ", depth=" .. tostring(depth), vim.log.levels.DEBUG)
+              vim.notify("Parsed args: input=" .. tostring(input_path) .. ", output=" .. tostring(output_path) .. ", depth=" .. tostring(depth), vim.log.levels.DEBUG)
 
-  -- Set default paths relative to current buffer
-  local current_dir = vim.fn.expand("%:p:h")
-  
-  -- Handle wildcard input
-  local is_wildcard = input_path and input_path:match("/%*$")
-  if is_wildcard then
-    input_path = input_path:sub(1, -2)  -- Remove the trailing *
-  end
-  
-  local function safe_path(path, default)
-    if path then
-      local p = Path:new(path)
-      return p and p:absolute() or default
-    end
-    return default
-  end
+              -- Set default paths relative to current buffer
+              local current_dir = vim.fn.expand("%:p:h")
+              
+              -- Handle wildcard input
+              local is_wildcard = input_path and input_path:match("/%*$")
+              if is_wildcard then
+                input_path = input_path:sub(1, -2)  -- Remove the trailing *
+              end
+              
+              local function safe_path(path, default)
+                if path then
+                  local p = Path:new(path)
+                  return p and p:absolute() or default
+                end
+                return default
+              end
 
-  input_path = safe_path(input_path, Path:new(current_dir, "input"):absolute())
-  output_path = safe_path(output_path, Path:new(current_dir, "output"):absolute())
+              input_path = safe_path(input_path, Path:new(current_dir, "input"):absolute())
+              output_path = safe_path(output_path, Path:new(current_dir, "output"):absolute())
 
-  vim.notify("Resolved paths: input=" .. tostring(input_path) .. ", output=" .. tostring(output_path), vim.log.levels.DEBUG)
+              vim.notify("Resolved paths: input=" .. tostring(input_path) .. ", output=" .. tostring(output_path), vim.log.levels.DEBUG)
 
-  -- Check if input_path exists
-  if not input_path or not vim.fn.isdirectory(tostring(input_path)) == 1 then
-    vim.notify("Input path does not exist or is not a directory: " .. tostring(input_path), vim.log.levels.ERROR)
-    return
-  end
+              -- Check if input_path exists
+              if not input_path or not vim.fn.isdirectory(tostring(input_path)) == 1 then
+                vim.notify("Input path does not exist or is not a directory: " .. tostring(input_path), vim.log.levels.ERROR)
+                return
+              end
 
-  -- Create output directory if it doesn't exist
-  if not output_path or vim.fn.isdirectory(tostring(output_path)) ~= 1 then
-    vim.fn.mkdir(tostring(output_path), "p")
-  end
+              -- Create output directory if it doesn't exist
+              if not output_path or vim.fn.isdirectory(tostring(output_path)) ~= 1 then
+                vim.fn.mkdir(tostring(output_path), "p")
+              end
 
-  local function process_file(file_path, yaml_opts)
-    vim.notify("Processing file: " .. file_path, vim.log.levels.INFO)
-    
-    local content
-    do
-      local input_file = io.open(file_path, "r")
-      if not input_file then
-        vim.notify("Failed to open input file: " .. file_path, vim.log.levels.ERROR)
-        return
-      end
-      
-      content = input_file:read("*all")
-      input_file:close()
-    end
-    
-    if not content or content == "" then
-      vim.notify("File is empty or couldn't be read: " .. file_path, vim.log.levels.WARN)
-      return
-    end
-    
-    vim.notify("File content length: " .. #content, vim.log.levels.DEBUG)
-    
-    vim.notify("File path: " .. file_path, vim.log.levels.DEBUG)
-    vim.notify("Input path: " .. tostring(input_path), vim.log.levels.DEBUG)
-    vim.notify("Output path: " .. tostring(output_path), vim.log.levels.DEBUG)
+              local function process_file(file_path, yaml_opts)
+                vim.notify("Processing file: " .. file_path, vim.log.levels.INFO)
+                
+                local content
+                do
+                  local input_file = io.open(file_path, "r")
+                  if not input_file then
+                    vim.notify("Failed to open input file: " .. file_path, vim.log.levels.ERROR)
+                    return
+                  end
+                  
+                  content = input_file:read("*all")
+                  input_file:close()
+                end
+                
+                if not content or content == "" then
+                  vim.notify("File is empty or couldn't be read: " .. file_path, vim.log.levels.WARN)
+                  return
+                end
+                
+                vim.notify("File content length: " .. #content, vim.log.levels.DEBUG)
+                
+                vim.notify("File path: " .. file_path, vim.log.levels.DEBUG)
+                vim.notify("Input path: " .. tostring(input_path), vim.log.levels.DEBUG)
+                vim.notify("Output path: " .. tostring(output_path), vim.log.levels.DEBUG)
 
-    local relative_path = Path:new(file_path):make_relative(input_path)
-    vim.notify("Relative path: " .. tostring(relative_path), vim.log.levels.DEBUG)
+                local relative_path = Path:new(file_path):make_relative(input_path)
+                vim.notify("Relative path: " .. tostring(relative_path), vim.log.levels.DEBUG)
 
-    if not relative_path then
-      vim.notify("Failed to create relative path for: " .. file_path, vim.log.levels.ERROR)
-      return
-    end
+                if not relative_path then
+                  vim.notify("Failed to create relative path for: " .. file_path, vim.log.levels.ERROR)
+                  return
+                end
 
-    local output_file_path = Path:new(output_path, relative_path)
-    vim.notify("Output file path: " .. tostring(output_file_path), vim.log.levels.DEBUG)
+                local output_file_path = Path:new(output_path, relative_path)
+                vim.notify("Output file path: " .. tostring(output_file_path), vim.log.levels.DEBUG)
 
-    if not output_file_path then
-      vim.notify("Failed to create output file path", vim.log.levels.ERROR)
-      return
-    end
+                if not output_file_path then
+                  vim.notify("Failed to create output file path", vim.log.levels.ERROR)
+                  return
+                end
 
-    -- Manually add the .yaml suffix
-    local output_file_path_str = tostring(output_file_path) .. ".yaml"
-    vim.notify("Output file path with suffix: " .. output_file_path_str, vim.log.levels.DEBUG)
+                -- Manually add the .yaml suffix
+                local output_file_path_str = tostring(output_file_path) .. ".yaml"
+                vim.notify("Output file path with suffix: " .. output_file_path_str, vim.log.levels.DEBUG)
 
-    output_file_path = Path:new(output_file_path_str)
+                output_file_path = Path:new(output_file_path_str)
 
-    if not output_file_path then
-      vim.notify("Failed to create new Path object with .yaml suffix", vim.log.levels.ERROR)
-      return
-    end
+                if not output_file_path then
+                  vim.notify("Failed to create new Path object with .yaml suffix", vim.log.levels.ERROR)
+                  return
+                end
 
-    vim.notify("Final output file path: " .. tostring(output_file_path), vim.log.levels.DEBUG)
-    
-    local output_file = io.open(tostring(output_file_path), "a+")
-    if not output_file then
-      vim.notify("Failed to open output file: " .. tostring(output_file_path), vim.log.levels.ERROR)
-      return
-    end
+                vim.notify("Final output file path: " .. tostring(output_file_path), vim.log.levels.DEBUG)
+                
+                local output_file = io.open(tostring(output_file_path), "a+")
+                if not output_file then
+                  vim.notify("Failed to open output file: " .. tostring(output_file_path), vim.log.levels.ERROR)
+                  return
+                end
 
-    -- Check if file already has content and position at the end
-    output_file:seek("end")
-    local file_size = output_file:seek()
-    local continuation = file_size > 0
-    
-  -- Add this new section for YAML structure prompt
-  local yaml_structure = params.yaml_structure or vim.fn.input("Enter desired YAML structure (e.g., summary, details, etc.): ")
-  if yaml_structure == "" then
-    vim.notify("No YAML structure provided. Using default structure.", vim.log.levels.WARN)
-    yaml_structure = "content"
-  end
+                -- Check if file already has content and position at the end
+                output_file:seek("end")
+                local file_size = output_file:seek()
+                local continuation = file_size > 0
+                
+              -- Add this new section for YAML structure prompt
+              local yaml_structure = params.yaml_structure or vim.fn.input("Enter desired YAML structure (e.g., summary, details, etc.): ")
+              if yaml_structure == "" then
+                vim.notify("No YAML structure provided. Using default structure.", vim.log.levels.WARN)
+                yaml_structure = "content"
+              end
 
-  -- Replace the existing process_chunk function with this updated version
-local function process_chunk(chunk, is_continuation)
-  vim.notify("Processing chunk, continuation: " .. tostring(is_continuation), vim.log.levels.DEBUG)
-  
-  -- Attempt AI processing (keeping this for future use if AI becomes available)
-  local success, result = pcall(prt.Prompt, {args = chunk}, prt.ui.Target.popup, model_obj, nil, template)
-  
-  -- If AI processing fails or returns nil/empty, use fallback processing
-  if not success or not result or result == "" then
-    vim.notify("AI processing failed or returned empty result, using fallback processing", vim.log.levels.WARN)
-    
-    -- Fallback: create a simple YAML structure
-    local yaml_result = "summary:\n"
-    local lines = {}
-    for line in chunk:gmatch("[^\r\n]+") do
-      table.insert(lines, line)
-    end
-    
-    -- Combine repeated lines
-    local current_line = ""
-    local count = 0
-    for _, line in ipairs(lines) do
-      if line == current_line then
-        count = count + 1
-      else
-        if count > 0 then
-          yaml_result = yaml_result .. string.format("  - %s (repeated %d times)\n", current_line, count + 1)
-        end
-        current_line = line
-        count = 0
-      end
-    end
-    if count > 0 then
-      yaml_result = yaml_result .. string.format("  - %s (repeated %d times)\n", current_line, count + 1)
-    end
-    
-    return yaml_result .. "\n# EOF\n", true
-  end
+              -- Replace the existing process_chunk function with this updated version
+            local function process_chunk(chunk, is_continuation)
+              vim.notify("Processing chunk, continuation: " .. tostring(is_continuation), vim.log.levels.DEBUG)
+              
+              -- Attempt AI processing (keeping this for future use if AI becomes available)
+              local success, result = pcall(prt.Prompt, {args = chunk}, prt.ui.Target.popup, model_obj, nil, template)
+              
+              -- If AI processing fails or returns nil/empty, use fallback processing
+              if not success or not result or result == "" then
+                vim.notify("AI processing failed or returned empty result, using fallback processing", vim.log.levels.WARN)
+                
+                -- Fallback: create a simple YAML structure
+                local yaml_result = "summary:\n"
+                local lines = {}
+                for line in chunk:gmatch("[^\r\n]+") do
+                  table.insert(lines, line)
+                end
+                
+                -- Combine repeated lines
+                local current_line = ""
+                local count = 0
+                for _, line in ipairs(lines) do
+                  if line == current_line then
+                    count = count + 1
+                  else
+                    if count > 0 then
+                      yaml_result = yaml_result .. string.format("  - %s (repeated %d times)\n", current_line, count + 1)
+                    end
+                    current_line = line
+                    count = 0
+                  end
+                end
+                if count > 0 then
+                  yaml_result = yaml_result .. string.format("  - %s (repeated %d times)\n", current_line, count + 1)
+                end
+                
+                return yaml_result .. "\n# EOF\n", true
+              end
 
-  -- If we somehow get here with a valid result from AI, use it
-  if type(result) == "string" then
-    if result:match("# EOF\n$") then
-      return result:gsub("# EOF\n$", ""), true
-    else
-      return result, false
-    end
-  end
+              -- If we somehow get here with a valid result from AI, use it
+              if type(result) == "string" then
+                if result:match("# EOF\n$") then
+                  return result:gsub("# EOF\n$", ""), true
+                else
+                  return result, false
+                end
+              end
 
-  -- If we get here, something unexpected happened
-  vim.notify("Unexpected result from processing", vim.log.levels.ERROR)
-  return nil, true
-end
+              -- If we get here, something unexpected happened
+              vim.notify("Unexpected result from processing", vim.log.levels.ERROR)
+              return nil, true
+            end
 
-    output_file:close()
-    vim.notify("Processed " .. file_path .. " and saved to " .. tostring(output_file_path), vim.log.levels.INFO)
-  end
+                output_file:close()
+                vim.notify("Processed " .. file_path .. " and saved to " .. tostring(output_file_path), vim.log.levels.INFO)
+              end
 
-  -- Function to get list of files to process
-  local function get_files_to_process()
-    vim.notify("Getting files to process", vim.log.levels.DEBUG)
-    if is_wildcard or vim.fn.isdirectory(tostring(input_path)) == 1 then
-      -- If input_path was a wildcard or is a directory
-      return vim.fn.globpath(tostring(input_path), "*", false, true)
-    elseif vim.fn.filereadable(tostring(input_path)) == 1 then
-      -- If input_path is a file
-      return {tostring(input_path)}
-    else
-      vim.notify("Invalid input path: " .. tostring(input_path), vim.log.levels.ERROR)
-      return {}
-    end
-  end
+              -- Function to get list of files to process
+              local function get_files_to_process()
+                vim.notify("Getting files to process", vim.log.levels.DEBUG)
+                if is_wildcard or vim.fn.isdirectory(tostring(input_path)) == 1 then
+                  -- If input_path was a wildcard or is a directory
+                  return vim.fn.globpath(tostring(input_path), "*", false, true)
+                elseif vim.fn.filereadable(tostring(input_path)) == 1 then
+                  -- If input_path is a file
+                  return {tostring(input_path)}
+                else
+                  vim.notify("Invalid input path: " .. tostring(input_path), vim.log.levels.ERROR)
+                  return {}
+                end
+              end
 
-  -- Get YAML formatting preferences
-  local yaml_format = vim.fn.input("Enter YAML formatting preferences (e.g., indent = 2, line_width = 80): ", "indent = 2, line_width = 80")
-  vim.notify("YAML format input: " .. yaml_format, vim.log.levels.DEBUG)
+              -- Get YAML formatting preferences
+              local yaml_format = vim.fn.input("Enter YAML formatting preferences (e.g., indent = 2, line_width = 80): ", "indent = 2, line_width = 80")
+              vim.notify("YAML format input: " .. yaml_format, vim.log.levels.DEBUG)
 
-  local yaml_opts
-  local yaml_load_success, yaml_load_result = pcall(function()
-    -- Convert "key: value" to "key = value" for Lua syntax
-    local lua_format = yaml_format:gsub("(%w+):%s*", "%1 = ")
-    local fn, err = load("return {" .. lua_format .. "}")
-    if not fn then
-      error("Failed to parse YAML options: " .. tostring(err))
-    end
-    return fn()
-  end)
+              local yaml_opts
+              local yaml_load_success, yaml_load_result = pcall(function()
+                -- Convert "key: value" to "key = value" for Lua syntax
+                local lua_format = yaml_format:gsub("(%w+):%s*", "%1 = ")
+                local fn, err = load("return {" .. lua_format .. "}")
+                if not fn then
+                  error("Failed to parse YAML options: " .. tostring(err))
+                end
+                return fn()
+              end)
 
-  if yaml_load_success then
-    yaml_opts = yaml_load_result
-  else
-    vim.notify("Error loading YAML options: " .. tostring(yaml_load_result), vim.log.levels.ERROR)
-    return
-  end
+              if yaml_load_success then
+                yaml_opts = yaml_load_result
+              else
+                vim.notify("Error loading YAML options: " .. tostring(yaml_load_result), vim.log.levels.ERROR)
+                return
+              end
 
-  if yaml_opts == nil then
-    vim.notify("Invalid YAML formatting options provided.", vim.log.levels.ERROR)
-    return
-  end
+              if yaml_opts == nil then
+                vim.notify("Invalid YAML formatting options provided.", vim.log.levels.ERROR)
+                return
+              end
 
-  -- Print the YAML options (for debugging)
-  vim.notify("Processing dataset with options: " .. vim.inspect(yaml_opts), vim.log.levels.INFO)
+              -- Print the YAML options (for debugging)
+              vim.notify("Processing dataset with options: " .. vim.inspect(yaml_opts), vim.log.levels.INFO)
 
-  local files = get_files_to_process()
-  vim.notify("Files to process: " .. vim.inspect(files), vim.log.levels.DEBUG)
-  
-  for _, file in ipairs(files) do
-    local should_process = true
-    for _, pattern in ipairs(exclude) do
-      if file:match(pattern) then
-        should_process = false
-        break
-      end
-    end
-    if should_process then
-      process_file(file, yaml_opts)
-    else
-      vim.notify("Skipping excluded file: " .. file, vim.log.levels.INFO)
-    end
-  end
+              local files = get_files_to_process()
+              vim.notify("Files to process: " .. vim.inspect(files), vim.log.levels.DEBUG)
+              
+              for _, file in ipairs(files) do
+                local should_process = true
+                for _, pattern in ipairs(exclude) do
+                  if file:match(pattern) then
+                    should_process = false
+                    break
+                  end
+                end
+                if should_process then
+                  process_file(file, yaml_opts)
+                else
+                  vim.notify("Skipping excluded file: " .. file, vim.log.levels.INFO)
+                end
+              end
 
-  vim.notify("All files processed.", vim.log.levels.INFO)
-end,
-      },
+              vim.notify("All files processed.", vim.log.levels.INFO)
+            end,-- }}}
+              },
     }
   end,
 }-- }}}

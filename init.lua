@@ -227,3 +227,5 @@ if ok then
     -- print("Error loading personal.beamer_folder module: " .. tostring(beamer_folder))
 end
 vim.api.nvim_set_keymap('n', '<leader>pr', ':PrtChatResponde<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>prr', ':PrtChatNew<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pa', ':PrtAsk<CR>', { noremap = true, silent = true })
