@@ -37,6 +37,10 @@ use {'nvim-telescope/telescope.nvim', tag = '0.1.4'}
   use 'crispgm/telescope-heading.nvim'
   use 'jakemason/ouroboros'
 
+  
+  use 'chrisbra/csv.vim'
+  use 'kevinhwang91/rnvimr'
+
 -- Colors
 use 'kepano/flexoki'
   use 'Shatur/neovim-ayu'

@@ -229,3 +229,28 @@ end
 vim.api.nvim_set_keymap('n', '<leader>pr', ':PrtChatResponde<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>prr', ':PrtChatNew<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pa', ':PrtAsk<CR>', { noremap = true, silent = true })
+
+
+-- Make Ranger replace Netrw and be the file explorer
+vim.g.rnvimr_enable_ex = 1
+
+-- Make Ranger to be hidden after picking a file
+vim.g.rnvimr_enable_picker = 1
+
+-- Replace `$EDITOR` candidate with this command to open the selected file
+vim.g.rnvimr_edit_cmd = 'drop'
+
+-- Disable a border for floating window
+vim.g.rnvimr_draw_border = 0
+
+-- Hide the files included in gitignore
+vim.g.rnvimr_hide_gitignore = 1
+
+-- Make Neovim wipe the buffers corresponding to the files deleted by Ranger
+vim.g.rnvimr_enable_bw = 1
+
+-- Add a shadow window, value is equal to 100 will disable shadow
+vim.g.rnvimr_shadow_winblend = 70
+
+-- Map Rnvimr action
+vim.api.nvim_set_keymap('n', '<leader>r', ':RnvimrToggle<CR>', {noremap = true, silent = true})
