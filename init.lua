@@ -253,4 +253,5 @@ vim.g.rnvimr_enable_bw = 1
 vim.g.rnvimr_shadow_winblend = 70
 
 -- Map Rnvimr action
-vim.api.nvim_set_keymap('n', '<leader>r', ':RnvimrToggle<CR>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>rr', ':RnvimrToggle<CR>', {noremap = true, silent = true})
+require('plugins.csv').setup()
