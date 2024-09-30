@@ -1,24 +1,20 @@
 " LateX-specfic configuration related to the VimTeX plugin
-
 " Only load this plugin it has not yet been loaded for this buffer
 if exists("b:did_myvimtexsettings")
   finish
 endif
-if !exists('g:vimtex_compiler_latexmk')
-  let g:vimtex_compiler_latexmk = {}
-  let g:vimtex_compiler_latexmk.build_dir = ''
-  let g:vimtex_compiler_latexmk.options += ['-shell-escape']
-  let g:vimtex_compiler_method = 'latexmk'
-endif
-if !has_key(g:vimtex_compiler_latexmk, 'options')
-  let g:vimtex_compiler_latexmk.options = [
+let g:vimtex_compiler_latexmk = {
+  \ 'build_dir' : '',
+  \ 'options' : [
     \ '-pdf',
+    \ '-shell-escape',
     \ '-verbose',
     \ '-file-line-error',
     \ '-synctex=1',
     \ '-interaction=nonstopmode',
-  \ ]
-endif
+  \ ],
+\}
+let g:vimtex_compiler_method = 'latexmk'
 let b:did_myvimtexsettings = 1
 
 nmap <leader>i <plug>(vimtex-info)
@@ -29,16 +25,13 @@ nmap <leader>t <CMD>VimtexTocToggle<CR>
 " ---------------------------------------------
 " Toggles shell escape compilation on and off
 function! s:TexToggleShellEscape() abort
-  if !has_key(g:vimtex_compiler_latexmk, 'options')
-    let g:vimtex_compiler_latexmk.options = []
-  endif
-  
-  if !empty(g:vimtex_compiler_latexmk.options) && g:vimtex_compiler_latexmk.options[0] ==# '-shell-escape'
+  let shell_escape_index = index(g:vimtex_compiler_latexmk.options, '-shell-escape')
+  if shell_escape_index != -1
     " Disable shell escape
-    call remove(g:vimtex_compiler_latexmk.options, 0)
+    call remove(g:vimtex_compiler_latexmk.options, shell_escape_index)
   else
     " Enable shell escape
-    call insert(g:vimtex_compiler_latexmk.options, '-shell-escape', 0)
+    call add(g:vimtex_compiler_latexmk.options, '-shell-escape')
   endif
   VimtexReload
   VimtexClean

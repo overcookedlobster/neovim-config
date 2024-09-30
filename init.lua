@@ -229,7 +229,18 @@ end
 vim.api.nvim_set_keymap('n', '<leader>pr', ':PrtChatResponde<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>prr', ':PrtChatNew<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pa', ':PrtAsk<CR>', { noremap = true, silent = true })
-
+local function keymapOptions(desc)
+    return {
+        noremap = true,
+        silent = true,
+        nowait = true,
+        desc = "GPT prompt " .. desc,
+    }
+end
+vim.keymap.set("v", "<C-p>r", ":<C-u>'<,'>PrtRewrite<cr>", keymapOptions("Visual Rewrite"))
+vim.keymap.set("v", "<C-p>a", ":<C-u>'<,'>PrtAppend<cr>", keymapOptions("Visual Append (after)"))
+vim.keymap.set("v", "<C-p>b", ":<C-u>'<,'>PrtPrepend<cr>", keymapOptions("Visual Prepend (before)"))
+vim.keymap.set("v", "<C-p>i", ":<C-u>'<,'>PrtImplement<cr>", keymapOptions("Implement selection"))
 
 -- Make Ranger replace Netrw and be the file explorer
 vim.g.rnvimr_enable_ex = 1
