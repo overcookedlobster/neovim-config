@@ -9,7 +9,7 @@ local ensure_packer = function()
   end
   return false
 end
-print(vim.inspect(vim.g.jukit_config_path))
+-- print(vim.inspect(vim.g.jukit_config_path))
 
 -- Set Python provider
 vim.g.python3_host_prog = '/usr/bin/python3'  -- Adjust path as needed

@@ -207,4 +207,18 @@ return
       ),
       { condition = line_begin }
     ),
+    s({trig = "lua", snippetType = "autosnippet"},
+      fmta(
+        [[
+        %! TeX program = lualatex
+        ]],
+        {}
+      ),
+      {
+        condition = function()
+          return vim.fn.line(".") == 1
+        end
+      }
+    ),
+
   }

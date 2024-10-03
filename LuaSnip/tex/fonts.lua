@@ -108,4 +108,14 @@ return
       ),
       { condition = tex.in_mathzone }
     ),
+    -- For red color
+    s({trig = "([^%a])rrr", regTrig = true, wordTrig = false, snippetType="autosnippet"},
+      fmta(
+        [[{\color{<>}<>}]],
+        {
+          t("red"),
+          d(1, get_visual),
+        }
+      )
+    ),
   }

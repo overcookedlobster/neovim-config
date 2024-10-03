@@ -41,7 +41,7 @@ M.refresh_diagnostics = function()
   
   current_diagnostics = vim.diagnostic.get(bufnr)
   
-  vim.diagnostic.show(nil, bufnr)
+  -- vim.diagnostic.show(nil, bufnr)
   
   for _, diagnostic in ipairs(current_diagnostics) do
     print(string.format("Line %d: %s", diagnostic.lnum + 1, diagnostic.message))
