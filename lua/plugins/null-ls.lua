@@ -1,14 +1,15 @@
 local null_ls = require("null-ls")
 
+local verilator = null_ls.builtins.diagnostics.verilator.with({
+  extra_args = { "--lint-only", "-Wall" },
+  method = null_ls.methods.DIAGNOSTICS_ON_SAVE,
+})
 null_ls.setup({
-  sources = {
-    null_ls.builtins.diagnostics.verilator.with({
-      extra_args = { "--lint-only", "-Wall" },
-    }),
-  },
+  sources = { verilator },
   on_attach = function(client, bufnr)
-    -- Enable diagnostics in normal mode
-    vim.api.nvim_create_autocmd("BufEnter", {
+    local augroup = vim.api.nvim_create_augroup("NullLsDiagnostics", { clear = true })
+    vim.api.nvim_create_autocmd({ "CursorHold", "BufWritePost" }, {
+      group = augroup,
       buffer = bufnr,
       callback = function()
         vim.diagnostic.show()
@@ -16,3 +17,4 @@ null_ls.setup({
     })
   end,
 })
+

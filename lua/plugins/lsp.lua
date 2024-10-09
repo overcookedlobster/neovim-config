@@ -27,6 +27,7 @@ lspconfig.svls.setup{
 }
 
 -- C LSP setup
+
 lspconfig.clangd.setup{
   on_attach = function(client, bufnr)
     -- Enable completion triggered by <c-x><c-o>
