@@ -46,10 +46,11 @@ end
 -- Load all snippet files
 local non_syn = load_snippets("non_synthesizable")
 local syn = load_snippets("synthesizable")
+local uvm = load_snippets("uvm")
 
 -- Combine all snippets
 local snippets = {}
-for _, snip_table in ipairs({syn, non_syn}) do
+for _, snip_table in ipairs({syn, non_syn, uvm}) do
     for _, snip in ipairs(snip_table) do
         table.insert(snippets, snip)
     end

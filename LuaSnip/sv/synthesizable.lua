@@ -5,7 +5,7 @@ local i = ls.insert_node
 
 return {
     -- Module
-    s("module", {
+    s("mod", {
         t("module "), i(1, "module_name"),
         t({ " (", "\t" }), i(2),
         t({ "", ");", "" }),
@@ -37,5 +37,31 @@ return {
         i(2, "i"), t(" < "), i(3, "N"), t("; "), i(4, "i"), t("++) begin : "), i(5, "gen_label"),
         t({ "", "\t" }), i(0),
         t({ "", "end", "endgenerate" })
+    }),
+    s("if", {
+        t("if ("), i(1, "condition"), t(") begin"),
+        t({ "", "\t" }), i(2),
+        t({ "", "end" }),
+        i(0)
+    }),
+    
+    s("ife", {
+        t("if ("), i(1, "condition"), t(") begin"),
+        t({ "", "\t" }), i(2),
+        t({ "", "end else begin" }),
+        t({ "", "\t" }), i(3),
+        t({ "", "end" }),
+        i(0)
+    }),
+    
+    s("while", {
+        t("while ("), i(1, "condition"), t(") begin"),
+        t({ "", "\t" }), i(0),
+        t({ "", "end" })
+    }),
+    
+    s("assign", {
+        t("assign "), i(1, "signal"), t(" = "), i(2, "value"), t(";"),
+        i(0)
     }),
 }

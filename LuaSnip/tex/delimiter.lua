@@ -88,5 +88,13 @@ return
       }
     )
   ),
+  s({trig = "tiit", snippetType="autosnippet"},
+    fmta(
+      "\\toggletext{<>}",
+      {
+        d(1, get_visual),
+      }
+    )
+  ),
 }
 

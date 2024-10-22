@@ -13,7 +13,7 @@ local helpers = require('personal.luasnip-helper-funcs')
 
 return {
   -- Initial block
-  s({trig="initial", descr="Initial block"},
+  s({trig="init", descr="Initial block"},
     fmt(
       [[
       initial begin
@@ -98,7 +98,7 @@ return {
   ),
 
   -- Fork-join
-  s({trig="forkjoin", descr="Fork-join block"},
+  s({trig="fork", descr="Fork-join block"},
     fmt(
       [[
       fork
@@ -233,14 +233,14 @@ return {
         {}
 
         // Methods
-        function new();
+        function new({});
           {}
         endfunction
 
         {}
       endclass
       ]],
-      {i(1, "class_name"), c(2, {t(""), sn(nil, {t("extends "), i(1, "parent_class")})}), i(3), i(4), i(0)}
+      {i(1, "class_name"), c(2, {t(""), sn(nil, {t("extends "), i(1, "parent_class")})}), i(3), i(4), i(5), i(0)}
     )
   ),
 
@@ -293,7 +293,7 @@ return {
   ),
 
   -- Clocking block
-  s({trig="clocking", descr="Clocking block"},
+  s({trig="clock", descr="Clocking block"},
     fmt(
       [[
       clocking {} @({});
@@ -316,4 +316,135 @@ return {
       {i(1, "program_name"), i(2, "interface_instance"), i(0)}
     )
   ),
+-- Foreach loop
+  s({trig="foreach", descr="Foreach loop"},
+    fmt(
+      [[
+      foreach ({} [{}]) begin
+        {}
+      end
+      ]],
+      {i(1, "item"), i(2, "array"), i(0)}
+    )
+  ),
+s({trig="for", descr="For loop"},
+  fmt(
+    [[
+    for (int {} = 0; {} < {}; {}++) begin
+      {}
+    end
+    ]],
+    {i(1, "i"), rep(1), i(2, "limit"), rep(1), i(0)}
+  )
+),
+-- Display task
+s({trig="disp", descr="Display task"},
+  fmt(
+    [[
+    $display("{}", {});
+    ]],
+    {i(1, "format_string"), i(2, "arguments")}
+  )
+),
+
+-- Strobe task
+s({trig="strobe", descr="Strobe task"},
+  fmt(
+    [[
+    $strobe("{}", {});
+    ]],
+    {i(1, "format_string"), i(2, "arguments")}
+  )
+),
+
+-- Write task
+s({trig="write", descr="Write task"},
+  fmt(
+    [[
+    $write("{}", {});
+    ]],
+    {i(1, "format_string"), i(2, "arguments")}
+  )
+),
+
+-- Monitor task
+s({trig="monitor", descr="Monitor task"},
+  fmt(
+    [[
+    $monitor("{}", {});
+    ]],
+    {i(1, "format_string"), i(2, "arguments")}
+  )
+),
+
+-- Fwrite task
+s({trig="fwrite", descr="Fwrite task"},
+  fmt(
+    [[
+    $fwrite({}, "{}", {});
+    ]],
+    {i(1, "file_handle"), i(2, "format_string"), i(3, "arguments")}
+  )
+),
+
+-- Sformat function
+s({trig="sformat", descr="Sformat function"},
+  fmt(
+    [[
+    $sformat({}, "{}", {});
+    ]],
+    {i(1, "string_var"), i(2, "format_string"), i(3, "arguments")}
+  )
+),
+
+-- Timeformat task
+s({trig="timeformat", descr="Timeformat task"},
+  fmt(
+    [[
+    $timeformat({}, {}, "{}", {});
+    ]],
+    {i(1, "units"), i(2, "precision"), i(3, "suffix"), i(4, "min_field_width")}
+  )
+),
+
+-- Printtimescale task
+s({trig="ptscale", descr="Printtimescale task"},
+  fmt(
+    [[
+    $printtimescale({});
+    ]],
+    {i(1, "module_or_scope")}
+  )
+),
+
+-- Value change dump
+s({trig="vcd", descr="Value change dump tasks"},
+  fmt(
+    [[
+    $dumpfile("{}");
+    $dumpvars({}, {});
+    ]],
+    {i(1, "filename.vcd"), i(2, "levels"), i(3, "module_or_variables")}
+  )
+),
+s({trig="forever", descr="Forever loop"},
+  fmt(
+    [[
+    forever begin
+      {}
+    end
+    ]],
+    {i(0)}
+  )
+),
+s({trig="repeat", descr="Repeat loop"},
+  fmt(
+    [[
+    repeat ({}) begin
+      {}
+    end
+    ]],
+    {i(1, "count"), i(0)}
+  )
+),
 }

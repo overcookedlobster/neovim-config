@@ -10,7 +10,6 @@ M.supported_filetypes = {
   bib = {"bib"},
   img = {"png", "pdf", "jpg", "jpeg", "eps", "ps", "gif", "bmp", "tiff"}
 }
-
 local function is_supported_file(file, types)
   local ext = file:match("^.+%.(.+)$")
   return ext and vim.tbl_contains(types, ext:lower())

@@ -266,3 +266,13 @@ vim.g.rnvimr_shadow_winblend = 70
 -- Map Rnvimr action
 vim.api.nvim_set_keymap('n', '<leader>rr', ':RnvimrToggle<CR>', {noremap = true, silent = true})
 require('plugins.csv').setup()
+
+   vim.api.nvim_set_keymap('i', '<Tab>', '<Tab>', { noremap = true, silent = true })
+   vim.api.nvim_set_keymap('s', '<Tab>', '<Tab>', { noremap = true, silent = true })
+
+
+
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+vim.opt.softtabstop = 2
