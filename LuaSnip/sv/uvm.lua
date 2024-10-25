@@ -418,7 +418,7 @@ return {
       {}
     )
   ),
-  s({trig="uvuob", descr="UVM Object Utils Block"},
+  s({trig="uvou", descr="UVM Object Utils Block"},
     fmt(
       [[
       `uvm_object_utils_begin({})
@@ -436,8 +436,8 @@ return {
   s({trig="uvminfo", descr="UVM Info Message"},
     fmt(
       [[
-      `uvm_info(get_type_name(), $sformatf("{}"), UVM_{})]],
-      {i(1, "message"), c(2, {t("NONE"), t("LOW"), t("MEDIUM"), t("HIGH"), t("FULL")})}
+      `uvm_info({}, $sformatf("{}"), UVM_{})]],
+      {i(1,"get_type_name()"),i(2, "message"), c(3, {t("NONE"), t("LOW"), t("MEDIUM"), t("HIGH"), t("FULL")})}
     )
   ),
 }

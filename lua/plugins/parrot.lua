@@ -1,210 +1,299 @@
--- use {
---   'frankroeder/parrot.nvim',
---   tag = "v0.4.2",
---   dependencies = { 'ibhagwan/fzf-lua', 'nvim-lua/plenary.nvim' },
---   config = function()
---     local Path = require("plenary.path")
---     local scan = require("plenary.scandir")
---     local yaml = require("yaml") -- Make sure to install lua-yaml
---
---     local parrot = require("parrot")
---     parrot.setup {
---       providers = {
---         anthropic = {
---           api_key = os.getenv "ANTHROPIC_API_KEY",
---           endpoint = "https://api.anthropic.com/v1/messages",
---           topic_prompt = "You only respond with 3 to 4 words to summarize the past conversation.",
---           topic = {
---             model = "claude-3-haiku-20240307",
---             params = { max_tokens = 32 },
---           },
---           params = {
---             chat = { max_tokens = 4096 },
---             command = { max_tokens = 4096 },
---           },
---         },
---         ollama = {} -- provide an empty list to make provider available
---       },
---       user_input_ui = "native",
---       hooks = {
---         ProcessLargeDataset = function(prt, params)
---           -- The entire hook function goes here
---           -- (The long function we developed earlier)
---           local args = vim.split(params.args or "", " ")
---           local input_path, output_path, depth, exclude = nil, nil, 1, {}
---           
---           -- ... (rest of the function)
---                   for i, arg in ipairs(args) do
---                     if arg == "-i" and args[i+1] then
---                       input_path = args[i+1]
---                     elseif arg == "-o" and args[i+1] then
---                       output_path = args[i+1]
---                     elseif arg == "-d" and args[i+1] then
---                       depth = tonumber(args[i+1]) or 1
---                     elseif arg == "-e" and args[i+1] then
---                       table.insert(exclude, args[i+1])
---                     end
---                   end
---                   
---                   -- Set default paths relative to current buffer
---                   local current_dir = vim.fn.expand("%:p:h")
---                   input_path = input_path or (current_dir .. "/input")
---                   output_path = output_path or (current_dir .. "/output")
---                   
---                   -- Create output directory if it doesn't exist
---                   vim.fn.mkdir(output_path, "p")
---                   
---                   -- Get YAML formatting preferences
---                   local yaml_format = prt.ui.input({
---                     prompt = "Enter YAML formatting preferences (e.g., indent: 2, line_width: 80):",
---                     default = "indent: 2, line_width: 80"
---                   })
---                   local yaml_opts = load("return {" .. yaml_format .. "}")()
---                   
---                   -- Function to process a single file
---                   local function process_file(file_path)
---                     local input_file = io.open(file_path, "r")
---                     if not input_file then
---                       prt.logger.error("Failed to open input file: " .. file_path)
---                       return
---                     end
---                     
---                     local content = input_file:read("*all")
---                     input_file:close()
---                     
---                     local output_file_path = Path:new(output_path, Path:new(file_path):make_relative(input_path)):with_suffix(".yaml")
---                     local output_file = io.open(output_file_path, "a+")
---                     if not output_file then
---                       prt.logger.error("Failed to open output file: " .. output_file_path)
---                       return
---                     end
---                     
---                     -- Check if file already has content and position at the end
---                     output_file:seek("end")
---                     local file_size = output_file:seek()
---                     local continuation = file_size > 0
---                     
---                     local function process_chunk(chunk, is_continuation)
---                       local template = [[
---                         Process the following content and produce a YAML output.
---                         If this is a continuation, ensure proper indentation and structure.
---                         Add explanations as comments starting with '#'.
---                         Be concise and focus on accuracy.
---                         Content:
---                         {{content}}
---                         
---                         Produce YAML output below. End with "# EOF" on a new line when complete:
---                       ]]
---                       
---                       if is_continuation then
---                         template = "Continue processing where you left off, maintaining proper YAML structure:\n" .. template
---                       end
---                       
---                       local model_obj = prt.get_model("command")
---                       local result = prt.Command(chunk, model_obj, template)
---                       
---                       -- Check if EOF was reached
---                       if string.match(result, "# EOF\n$") then
---                         return result:gsub("# EOF\n$", ""), true
---                       else
---                         return result, false
---                       end
---                     end
---                     
---                     local is_complete = false
---                     local processed_content = ""
---                     while not is_complete do
---                       local chunk, complete = process_chunk(content, continuation)
---                       processed_content = processed_content .. chunk
---                       is_complete = complete
---                       continuation = true
---                       
---                       if not is_complete then
---                         prt.logger.info("Output incomplete for " .. file_path .. ". Continuing...")
---                         vim.loop.sleep(60000)  -- Wait 1 minute to respect rate limits
---                       end
---                     end
---                     
---                     -- Validate and format YAML
---                     local success, parsed_yaml = pcall(yaml.load, processed_content)
---                     if not success then
---                       prt.logger.error("Invalid YAML produced for " .. file_path)
---                       return
---                     end
---                     
---                     local formatted_yaml = yaml.dump(parsed_yaml, yaml_opts)
---                     output_file:write(formatted_yaml)
---                     output_file:close()
---                     prt.logger.info("Processed " .. file_path .. " and saved to " .. output_file_path)
---                   end
---                   
---                   -- Function to get list of files to process
---                   local function get_files_to_process()
---                     local files = {}
---                     if input_path:match("/%*$") then
---                       -- If input_path ends with /*, it's a directory
---                       input_path = input_path:sub(1, -2)  -- Remove *
---                       files = scan.scan_dir(input_path, {depth = depth, add_dirs = false})
---                     elseif vim.fn.filereadable(input_path) == 1 then
---                       -- If input_path is a file
---                       files = {input_path}
---                     else
---                       -- Default: all files in input_path directory
---                       files = scan.scan_dir(input_path, {depth = depth, add_dirs = false})
---                     end
---                     
---                     -- Filter out excluded files and .git folders
---                     return vim.tbl_filter(function(file)
---                       local relative_path = Path:new(file):make_relative(input_path)
---                       return not vim.tbl_contains(exclude, relative_path) and not relative_path:match("^%.git/")
---                     end, files)
---                   end
---                   
---                   local files = get_files_to_process()
---                   local total_files = #files
---                   local processed_files = 0
---                   
---                   -- Create progress bar popup
---                   local progress_win, progress_buf
---                   local function update_progress()
---                     if not progress_win or not vim.api.nvim_win_is_valid(progress_win) then
---                       progress_buf = vim.api.nvim_create_buf(false, true)
---                       local width = 60
---                       local height = 3
---                       local win_opts = {
---                         relative = "editor",
---                         width = width,
---                         height = height,
---                         row = (vim.o.lines - height) / 2,
---                         col = (vim.o.columns - width) / 2,
---                         style = "minimal",
---                         border = "rounded"
---                       }
---                       progress_win = vim.api.nvim_open_win(progress_buf, false, win_opts)
---                     end
---                     
---                     local percentage = math.floor((processed_files / total_files) * 100)
---                     local progress_bar = string.rep("█", percentage / 2) .. string.rep("░", 50 - (percentage / 2))
---                     local progress_text = string.format("Processing: [%s] %d%%", progress_bar, percentage)
---                     vim.api.nvim_buf_set_lines(progress_buf, 0, -1, false, {progress_text})
---                   end
---                   
---                   for _, file in ipairs(files) do
---                     process_file(file)
---                     processed_files = processed_files + 1
---                     update_progress()
---                   end
---                   
---                   -- Close progress bar
---                   if progress_win and vim.api.nvim_win_is_valid(progress_win) then
---                     vim.api.nvim_win_close(progress_win, true)
---                   end
---                   
---                   prt.logger.info("All files processed.")
---
---         end,
---       },
---     }
---   end,
--- }
---
+local M = {
+  "frankroeder/parrot.nvim",
+  event = "VeryLazy",
+  dependencies = { "ibhagwan/fzf-lua", "nvim-lua/plenary.nvim", "rcarriga/nvim-notify" },
+  dev = true, -- for local development
+  lazy = false,
+  config = function(_, opts)
+    require("notify").setup {
+      background_colour = "#000000",
+      render = "compact",
+      top_down = false,
+    }
+    require("parrot").setup(opts)
+  end,
+  opts = {
+    providers = {
+      -- openai = {
+      --   api_key = { "/usr/bin/security", "find-generic-password", "-s openai-api-key", "-w" },
+      -- },
+      anthropic = {
+        -- api_key = { "/usr/bin/security", "find-generic-password", "-s anthropic-api-key", "-w" },
+          api_key = os.getenv "ANTHROPIC_API_KEY",
+      },
+      ollama = {},
+      -- gemini = {
+      --   api_key = os.getenv "GEMINI_API_KEY",
+      -- },
+      -- pplx = {
+      --   api_key = { "/usr/bin/security", "find-generic-password", "-s perplexity-api-key", "-w" },
+      -- },
+      -- mistral = {
+      --   api_key = os.getenv "MISTRAL_API_KEY",
+      -- },
+      -- groq = {
+      --   api_key = os.getenv "GROQ_API_KEY",
+      -- },
+      github = {
+        api_key = os.getenv "GITHUB_TOKEN",
+      },
+    },
+    cmd_prefix = "Prt",
+    chat_conceal_model_params = false,
+    user_input_ui = "buffer",
+    toggle_target = "tabnew",
+    online_model_selection = true,
+    command_auto_select_response = true,
+    hooks = {
+      Complete = function(prt, params)
+        local template = [[
+        I have the following code from {{filename}}:
+
+        ```{{filetype}}
+        {{selection}}
+        ```
+
+        Please finish the code above carefully and logically.
+        Respond just with the snippet of code that should be inserted."
+        ]]
+        local model_obj = prt.get_model "command"
+        prt.Prompt(params, prt.ui.Target.append, model_obj, nil, template)
+      end,
+      CompleteFullContext = function(prt, params)
+        local template = [[
+        I have the following code from {{filename}}:
+
+        ```{{filetype}}
+        {filecontent}}
+        ```
+
+        Please look at the following section specifically:
+        ```{{filetype}}
+        {{selection}}
+        ```
+
+        Please finish the code above carefully and logically.
+        Respond just with the snippet of code that should be inserted.
+        ]]
+        local model_obj = prt.get_model "command"
+        prt.Prompt(params, prt.ui.Target.append, model_obj, nil, template)
+      end,
+      CompleteMultiContext = function(prt, params)
+        local template = [[
+        I have the following code from {{filename}} and other realted files:
+
+        ```{{filetype}}
+        {{multifilecontent}}
+        ```
+
+        Please look at the following section specifically:
+        ```{{filetype}}
+        {{selection}}
+        ```
+
+        Please finish the code above carefully and logically.
+        Respond just with the snippet of code that should be inserted.
+        ]]
+        local model_obj = prt.get_model "command"
+        prt.Prompt(params, prt.ui.Target.append, model_obj, nil, template)
+      end,
+      Explain = function(prt, params)
+        local template = [[
+        Your task is to take the code snippet from {{filename}} and explain it with gradually increasing complexity.
+        Break down the code's functionality, purpose, and key components.
+        The goal is to help the reader understand what the code does and how it works.
+
+        ```{{filetype}}
+        {{selection}}
+        ```
+
+        Use the markdown format with codeblocks and inline code.
+        Explanation of the code above:
+        ]]
+        local model = prt.get_model "command"
+        prt.logger.info("Explaining selection with model: " .. model.name)
+        prt.Prompt(params, prt.ui.Target.new, model, nil, template)
+      end,
+      FixBugs = function(prt, params)
+        local template = [[
+        You are an expert in {{filetype}}.
+        Fix bugs in the below code from {{filename}} carefully and logically:
+        Your task is to analyze the provided {{filetype}} code snippet, identify
+        any bugs or errors present, and provide a corrected version of the code
+        that resolves these issues. Explain the problems you found in the
+        original code and how your fixes address them. The corrected code should
+        be functional, efficient, and adhere to best practices in
+        {{filetype}} programming.
+
+        ```{{filetype}}
+        {{selection}}
+        ```
+
+        Fixed code:
+        ]]
+        local model_obj = prt.get_model "command"
+        prt.logger.info("Fixing bugs in selection with model: " .. model_obj.name)
+        prt.Prompt(params, prt.ui.Target.new, model_obj, nil, template)
+      end,
+      Optimize = function(prt, params)
+        local template = [[
+        You are an expert in {{filetype}}.
+        Your task is to analyze the provided {{filetype}} code snippet and
+        suggest improvements to optimize its performance. Identify areas
+        where the code can be made more efficient, faster, or less
+        resource-intensive. Provide specific suggestions for optimization,
+        along with explanations of how these changes can enhance the code's
+        performance. The optimized code should maintain the same functionality
+        as the original code while demonstrating improved efficiency.
+
+        ```{{filetype}}
+        {{selection}}
+        ```
+
+        Optimized code:
+        ]]
+        local model_obj = prt.get_model "command"
+        prt.logger.info("Optimizing selection with model: " .. model_obj.name)
+        prt.Prompt(params, prt.ui.Target.new, model_obj, nil, template)
+      end,
+      UnitTests = function(prt, params)
+        local template = [[
+        I have the following code from {{filename}}:
+
+        ```{{filetype}}
+        {{selection}}
+        ```
+
+        Please respond by writing table driven unit tests for the code above.
+        ]]
+        local model_obj = prt.get_model "command"
+        prt.logger.info("Creating unit tests for selection with model: " .. model_obj.name)
+        prt.Prompt(params, prt.ui.Target.enew, model_obj, nil, template)
+      end,
+      Debug = function(prt, params)
+        local template = [[
+        I want you to act as {{filetype}} expert.
+        Review the following code, carefully examine it, and report potential
+        bugs and edge cases alongside solutions to resolve them.
+        Keep your explanation short and to the point:
+
+        ```{{filetype}}
+        {{selection}}
+        ```
+        ]]
+        local model_obj = prt.get_model "command"
+        prt.logger.info("Debugging selection with model: " .. model_obj.name)
+        prt.Prompt(params, prt.ui.Target.enew, model_obj, nil, template)
+      end,
+      CommitMsg = function(prt, params)
+        local futils = require "parrot.file_utils"
+        if futils.find_git_root() == "" then
+          prt.logger.warning "Not in a git repository"
+          return
+        else
+          local template = [[
+          I want you to act as a commit message generator. I will provide you
+          with information about the task and the prefix for the task code, and
+          I would like you to generate an appropriate commit message using the
+          conventional commit format. Do not write any explanations or other
+          words, just reply with the commit message.
+          Start with a short headline as summary but then list the individual
+          changes in more detail.
+
+          Here are the changes that should be considered by this message:
+          ]] .. vim.fn.system "git diff --no-color --no-ext-diff --staged"
+          local model_obj = prt.get_model "command"
+          prt.Prompt(params, prt.ui.Target.append, model_obj, nil, template)
+        end
+      end,
+      SpellCheck = function(prt, params)
+        local chat_prompt = [[
+        Your task is to take the text provided and rewrite it into a clear,
+        grammatically correct version while preserving the original meaning
+        as closely as possible. Correct any spelling mistakes, punctuation
+        errors, verb tense issues, word choice problems, and other
+        grammatical mistakes.
+        ]]
+        prt.ChatNew(params, chat_prompt)
+      end,
+      CodeConsultant = function(prt, params)
+        local chat_prompt = [[
+          Your task is to analyze the provided {{filetype}} code and suggest
+          improvements to optimize its performance. Identify areas where the
+          code can be made more efficient, faster, or less resource-intensive.
+          Provide specific suggestions for optimization, along with explanations
+          of how these changes can enhance the code's performance. The optimized
+          code should maintain the same functionality as the original code while
+          demonstrating improved efficiency.
+
+          Here is the code
+          ```{{filetype}}
+          {{filecontent}}
+          ```
+        ]]
+        prt.ChatNew(params, chat_prompt)
+      end,
+      ProofReader = function(prt, params)
+        local chat_prompt = [[
+        I want you to act as a proofreader. I will provide you with texts and
+        I would like you to review them for any spelling, grammar, or
+        punctuation errors. Once you have finished reviewing the text,
+        provide me with any necessary corrections or suggestions to improve the
+        text. Highlight the corrected fragments (if any) using markdown backticks.
+
+        When you have done that subsequently provide me with a slightly better
+        version of the text, but keep close to the original text.
+
+        Finally provide me with an ideal version of the text.
+
+        Whenever I provide you with text, you reply in this format directly:
+
+        ## Corrected text:
+
+        {corrected text, or say "NO_CORRECTIONS_NEEDED" instead if there are no corrections made}
+
+        ## Slightly better text
+
+        {slightly better text}
+
+        ## Ideal text
+
+        {ideal text}
+        ]]
+        prt.ChatNew(params, chat_prompt)
+      end,
+    },
+  },
+  keys = {
+    { "<C-g>c", "<cmd>PrtChatNew<cr>", mode = { "n", "i" }, desc = "New Chat" },
+    { "<C-g>c", ":<C-u>'<,'>PrtChatNew<cr>", mode = { "v" }, desc = "Visual Chat New" },
+    { "<C-g>t", "<cmd>PrtChatToggle<cr>", mode = { "n", "i" }, desc = "Toggle Popup Chat" },
+    { "<C-g>f", "<cmd>PrtChatFinder<cr>", mode = { "n", "i" }, desc = "Chat Finder" },
+    { "<C-g>r", "<cmd>PrtRewrite<cr>", mode = { "n", "i" }, desc = "Inline Rewrite" },
+    { "<C-g>r", ":<C-u>'<,'>PrtRewrite<cr>", mode = { "v" }, desc = "Visual Rewrite" },
+    {
+      "<C-g>j",
+      "<cmd>PrtRetry<cr>",
+      mode = { "n" },
+      desc = "Retry rewrite/append/prepend command",
+    },
+    { "<C-g>a", "<cmd>PrtAppend<cr>", mode = { "n", "i" }, desc = "Append" },
+    { "<C-g>a", ":<C-u>'<,'>PrtAppend<cr>", mode = { "v" }, desc = "Visual Append" },
+    { "<C-g>o", "<cmd>PrtPrepend<cr>", mode = { "n", "i" }, desc = "Prepend" },
+    { "<C-g>o", ":<C-u>'<,'>PrtPrepend<cr>", mode = { "v" }, desc = "Visual Prepend" },
+    { "<C-g>e", ":<C-u>'<,'>PrtEnew<cr>", mode = { "v" }, desc = "Visual Enew" },
+    { "<C-g>s", "<cmd>PrtStop<cr>", mode = { "n", "i", "v", "x" }, desc = "Stop" },
+    {
+      "<C-g>i",
+      ":<C-u>'<,'>PrtComplete<cr>",
+      mode = { "n", "i", "v", "x" },
+      desc = "Complete visual selection",
+    },
+    { "<C-g>x", "<cmd>PrtContext<cr>", mode = { "n" }, desc = "Open context file" },
+    { "<C-g>n", "<cmd>PrtModel<cr>", mode = { "n" }, desc = "Select model" },
+    { "<C-g>p", "<cmd>PrtProvider<cr>", mode = { "n" }, desc = "Select provider" },
+    { "<C-g>q", "<cmd>PrtAsk<cr>", mode = { "n" }, desc = "Ask a question" },
+  },
+}
+
+return M

@@ -81,14 +81,14 @@ require('personal.transient-notes').setup({
 -- Load utilities
 require('utils').setup()
 -- Load colorscheme
-require('ayu').setup({
-    mirage = true, -- Set to `true` to use `mirage` variant instead of `dark` for dark background.
-    terminal = true, -- Set to `false` to let terminal manage its own colors.
-    overrides = {}, -- A dictionary of group names, each associated with a dictionary of parameters (`bg`, `fg`, `sp` and `style`) and colors in hex.
-})
+-- require('ayu').setup({
+--     mirage = true, -- Set to `true` to use `mirage` variant instead of `dark` for dark background.
+--     terminal = true, -- Set to `false` to let terminal manage its own colors.
+--     overrides = {}, -- A dictionary of group names, each associated with a dictionary of parameters (`bg`, `fg`, `sp` and `style`) and colors in hex.
+-- })
 vim.opt.hlsearch = true
 -- vim.opt.background = "dark"
--- vim.cmd('colorscheme gruvbox')
+vim.cmd('colorscheme gruvbox-material')
 vim.o.background = "dark" vim.g.gruvbox_material_background = "soft"
 vim.g.gruvbox_material_ui_contrast = "high"
 vim.g.gruvbox_material_foreground = "original"
@@ -96,7 +96,7 @@ vim.g.gruvbox_material_enable_italic = 1
 vim.g.gruvbox_material_enable_bold = 1
 vim.g.gruvbox_material_visual ="red background"
 -- vim.g.gruvbox_material_better_performance = 1
-vim.cmd("colorscheme lunaperche")
+-- vim.cmd("colorscheme lunaperche")
 
 local clipboard_saver = require('clipboard_image_saver')
 clipboard_saver.setup({
@@ -276,3 +276,15 @@ vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 vim.opt.softtabstop = 2
+
+vim.keymap.set("n", "<C-h>", "<C-w>h")
+vim.keymap.set("n", "<C-j>", "<C-w>j")
+vim.keymap.set("n", "<C-k>", "<C-w>k")
+vim.keymap.set("n", "<C-l>", "<C-w>l")
+
+vim.keymap.set("t", "<C-h>", "<cmd>wincmd h<CR>")
+vim.keymap.set("t", "<C-j>", "<cmd>wincmd j<CR>")
+vim.keymap.set("t", "<C-k>", "<cmd>wincmd k<CR>")
+vim.keymap.set("t", "<C-l>", "<cmd>wincmd l<CR>")
+vim.keymap.set('n', '<TAB>', ':bn<CR>', { silent = true })
+vim.keymap.set('n', '<S-TAB>', ':bp<CR>', { silent = true })

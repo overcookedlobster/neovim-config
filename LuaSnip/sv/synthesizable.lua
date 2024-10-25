@@ -45,7 +45,7 @@ return {
         i(0)
     }),
     
-    s("ife", {
+    s("ifel", {
         t("if ("), i(1, "condition"), t(") begin"),
         t({ "", "\t" }), i(2),
         t({ "", "end else begin" }),
