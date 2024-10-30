@@ -614,6 +614,7 @@ use {
   use {'ibhagwan/fzf-lua', branch = 'main'}
   use 'nvim-tree/nvim-web-devicons'
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
+  use 'vhda/verilog_systemverilog.vim'  -- Enhanced SystemVerilog support
   use 'neovim/nvim-lspconfig'
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-omni'
