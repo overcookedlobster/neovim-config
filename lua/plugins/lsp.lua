@@ -35,6 +35,11 @@ M.setup = function()
       systemverilog = {
         includeIndexing = {"**/*.{sv,svh}"},
         excludeIndexing = {"**/test/**"},
+        defineModules = {
+          uvm = {
+            directories = { os.getenv("UVM_HOME/src") }
+          }
+        }
       }
     }
   }

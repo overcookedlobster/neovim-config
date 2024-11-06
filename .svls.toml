@@ -1,0 +1,16 @@
+[options]
+# Include standard UVM library path if using UVM
+# libraryPaths = ["path/to/uvm/src"]
+
+# SystemVerilog file extensions to analyze
+fileExtensions = ["*.sv", "*.svh", "*.v", "*.vh"]
+
+# Preprocessor defines
+defines = []
+
+# Library files or packages to include
+libraryFiles = []
+
+# Exclude patterns
+excludePatterns = ["**/sim/**", "**/tb/**"]
+                

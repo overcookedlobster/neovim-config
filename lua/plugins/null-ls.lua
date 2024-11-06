@@ -1,6 +1,6 @@
 local null_ls = require("null-ls")
 local verilator = null_ls.builtins.diagnostics.verilator.with({
-  extra_args = { "--lint-only", "-Wall", "-I" .. os.getenv("UVM_HOME") .. "/src" },
+  extra_args = { "--lint-only", "-Wall", "-I" .. os.getenv("UVM_HOME") .. "/src", "-I *" },
   method = null_ls.methods.DIAGNOSTICS_ON_SAVE,
 })
 null_ls.setup({

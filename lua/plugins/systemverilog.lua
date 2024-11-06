@@ -1,94 +1,150 @@
 -- File: ~/.config/nvim/lua/plugins/systemverilog.lua
 local M = {}
 
--- Define the mappings function at the module level
-local function set_sv_mappings()
-    local opts = { noremap = true, silent = true }
-    
-    -- Instance template generation
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>vi', ':VerilogInstance<CR>', opts)
-    
-    -- Go to module definition
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>vg', ':VerilogGotoInstanceStart<CR>', opts)
-    
-    -- Follow instance port connections
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>vf', ':VerilogFollowInstance<CR>', opts)
-    
-    -- Follow instance port declarations
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>vd', ':VerilogFollowPort<CR>', opts)
-    
-    -- Open matching file (implementation/header)
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>vo', ':VerilogOpenMatchingFile<CR>', opts)
-end
-
--- Make the function accessible through the module
-M.apply_mappings = set_sv_mappings
-
 M.setup = function()
-    -- Configure verilog_systemverilog plugin settings
-    vim.g.verilog_syntax_fold_lst = "module,function,task,specify,interface"
-    vim.g.verilog_dont_deindent_eos = 1
+    -- Base configuration remains the same
+    vim.g.verilog_syntax_fold_lst = "block,function,task,specify,module,class,covergroup"
+    vim.g.verilog_disable_indent_lst = "eos"
     vim.g.verilog_indent_modules = 1
     vim.g.verilog_indent_width = 2
-    vim.g.verilog_disable_indent_lst = "eos"
-    
-    -- Enable automatic indentation for SystemVerilog files
-    vim.cmd([[
-        augroup systemverilog_settings
-            autocmd!
-            autocmd FileType systemverilog setlocal foldmethod=syntax
-            autocmd FileType systemverilog setlocal tabstop=2
-            autocmd FileType systemverilog setlocal shiftwidth=2
-            autocmd FileType systemverilog setlocal expandtab
-            autocmd FileType systemverilog setlocal autoindent
-            autocmd FileType systemverilog setlocal smartindent
-        augroup END
-    ]])
 
-    -- Define SystemVerilog file patterns
-    vim.cmd([[
-        augroup systemverilog_files
-            autocmd!
-            autocmd BufNewFile,BufRead *.sv,*.svh setfiletype systemverilog
-        augroup END
-    ]])
-
-    -- Apply mappings for SystemVerilog files using a more reliable method
-    vim.cmd([[
-        augroup systemverilog_mappings
-            autocmd!
-            autocmd FileType systemverilog lua require('plugins.systemverilog').apply_mappings()
-        augroup END
-    ]])
-
-    -- Setup LSP for SystemVerilog
     local lspconfig = require('lspconfig')
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
+    -- Enhanced LSP configuration for better context awareness
     lspconfig.svls.setup{
         capabilities = capabilities,
         on_attach = function(client, bufnr)
-            -- Enable completion triggered by <c-x><c-o>
-            vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-            
-            -- LSP mappings
+            -- Previous LSP mappings remain...
             local bufopts = { noremap=true, silent=true, buffer=bufnr }
             vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
             vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
             vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
             vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
             vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-            
-            -- Apply SystemVerilog specific mappings
-            M.apply_mappings()
+            vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
+            vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
+
+            -- Enhanced hover for SystemVerilog objects
+            vim.keymap.set('n', 'K', function()
+                local filetype = vim.bo.filetype
+                if filetype == 'systemverilog' then
+                    -- Try to get enhanced hover information
+                    vim.lsp.buf.hover()
+                end
+            end, bufopts)
+
+            print("SystemVerilog LSP attached with enhanced context support")
         end,
         settings = {
             systemverilog = {
-                includeIndexing = {"**/*.{sv,svh}"},
-                excludeIndexing = {"**/test/**"},
+                -- File indexing configuration
+                includeIndexing = {
+                    "**/*.sv",
+                    "**/*.svh",
+                    "**/*.v",
+                    "**/*.vh"
+                },
+                excludeIndexing = {
+                    "**/sim/**",
+                    "**/tb/**"
+                },
+                -- Library paths - important for finding built-in classes and methods
+                libraryFiles = {
+                    "**/*.sv",
+                    "**/*.svh",
+                    "**/*.v",
+                    "**/*.vh"
+                },
+                -- Enhanced feature set
+                features = {
+                    classContext = true,
+                    memberCompletion = true,
+                    hover = true,
+                    signatureHelp = true,
+                    -- Additional features for better context awareness
+                    semanticHighlighting = true,
+                    documentSymbols = true,
+                    documentFormatting = true
+                },
+                -- Parser configuration for better context understanding
+                parser = {
+                    -- Enable class and covergroup parsing
+                    parseClassProperties = true,
+                    parseCovergroups = true,
+                    parseAssertions = true,
+                    parseConstraints = true
+                },
+                -- Type information
+                typeHierarchy = {
+                    enabled = true,
+                    depth = 3
+                }
             }
-        }
+        },
+        -- Improved workspace configuration
+        root_dir = function(fname)
+            local util = require('lspconfig.util')
+            return util.root_pattern(
+                'svls.toml',
+                '.svls.toml',
+                '.git',
+                'package.sv'
+            )(fname) or util.path.dirname(fname)
+        end
     }
+
+    -- Create an enhanced SVLS config
+    local function create_svls_config()
+        local config_file = vim.fn.getcwd() .. '/.svls.toml'
+        if vim.fn.filereadable(config_file) == 0 then
+            local f = io.open(config_file, 'w')
+            if f then
+                f:write([[
+[options]
+# SystemVerilog file extensions
+fileExtensions = ["*.sv", "*.svh", "*.v", "*.vh"]
+
+# Parser settings
+[parser]
+# Enable parsing of all relevant constructs
+parseClassProperties = true
+parseCovergroups = true
+parseAssertions = true
+parseConstraints = true
+
+# Type hierarchy settings
+[typeHierarchy]
+enabled = true
+depth = 3
+
+# Include paths for standard libraries and UVM
+[libraries]
+# Add paths to any standard libraries you use
+paths = [
+    # Example UVM path (uncomment and modify as needed)
+    # "/path/to/uvm/src"
+]
+
+# Preprocessor defines
+[defines]
+# Add any necessary defines here
+values = []
+
+# Workspace settings
+[workspace]
+# Library files or packages to include
+libraryFiles = []
+# Files to exclude
+excludePatterns = ["**/sim/**", "**/tb/**"]
+                ]])
+                f:close()
+                print("Created enhanced SVLS config file at " .. config_file)
+            end
+        end
+    end
+
+    create_svls_config()
 end
 
 return M
