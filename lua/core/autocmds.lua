@@ -30,12 +30,22 @@ autocmd("FileType", {
     -- Add other SystemVerilog-specific setup here
   end,
 })
+local tab_switching = false
 
-autocmd({"BufReadPost", "BufEnter"}, {
-  pattern = {"*.sv", "*.v"},
-  group = sv_group,
+vim.api.nvim_create_autocmd("TabLeave", {
   callback = function()
-    if require("utils").is_sv_file() then
+    tab_switching = true
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = {"*.sv", "*.v"},
+  callback = function()
+    if tab_switching then
+      -- ignore diagnostic updates on tab switch
+      tab_switching = false
+    else
+      -- perform diagnostic updates
       vim.diagnostic.show()
       require("utils").refresh_diagnostics()
     end
