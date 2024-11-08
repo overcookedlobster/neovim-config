@@ -31,8 +31,8 @@ return require('packer').startup(function(use)
   use 'tiagovla/tokyodark.nvim'
   use {'xuhdev/vim-latex-live-preview', ft = 'tex'}
   use {'L3MON4D3/LuaSnip', tag = 'v2.*', run = 'make install_jsregexp'}
-use 'nvim-lua/plenary.nvim'
-use {'nvim-telescope/telescope.nvim', tag = '0.1.4'}
+  use 'nvim-lua/plenary.nvim'
+  use {'nvim-telescope/telescope.nvim', tag = '0.1.4'}
   use 'nvim-telescope/telescope-file-browser.nvim'
   use 'crispgm/telescope-heading.nvim'
   use 'jakemason/ouroboros'
@@ -72,6 +72,9 @@ use {
         ollama = {},
         xai = {
           api_key = os.getenv "XAI_API_KEY",
+        },
+        nvidia = {
+          api_key = os.getenv "NVIDIA_API_KEY",
         },
       },
       cmd_prefix = "Prt",
