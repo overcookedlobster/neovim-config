@@ -92,12 +92,12 @@ require('utils').setup()
 vim.opt.hlsearch = true
 -- vim.opt.background = "dark"
 vim.cmd('colorscheme gruvbox-material')
-vim.o.background = "dark" vim.g.gruvbox_material_background = "soft"
-vim.g.gruvbox_material_ui_contrast = "high"
-vim.g.gruvbox_material_foreground = "original"
-vim.g.gruvbox_material_enable_italic = 1
-vim.g.gruvbox_material_enable_bold = 1
-vim.g.gruvbox_material_visual ="red background"
+-- vim.o.background = "dark" vim.g.gruvbox_material_background = "soft"
+-- vim.g.gruvbox_material_ui_contrast = "high"
+-- vim.g.gruvbox_material_foreground = "original"
+-- vim.g.gruvbox_material_enable_italic = 1
+-- vim.g.gruvbox_material_enable_bold = 1
+-- vim.g.gruvbox_material_visual ="red background"
 -- vim.g.gruvbox_material_better_performance = 1
 -- vim.cmd("colorscheme lunaperche")
 
@@ -231,6 +231,7 @@ if ok then
 end
 vim.api.nvim_set_keymap('n', '<leader>pr', ':PrtChatResponde<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>prr', ':PrtChatNew<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pp', ':PrtProvider<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pa', ':PrtAsk<CR>', { noremap = true, silent = true })
 local function keymapOptions(desc)
     return {

@@ -10,6 +10,7 @@ local fmt = require("luasnip.extras.fmt").fmt
 local fmta = require("luasnip.extras.fmt").fmta
 local rep = require("luasnip.extras").rep
 local helpers = require('personal.luasnip-helper-funcs')
+local get_visual = helpers.get_visual
 
 return {
   -- Initial block
@@ -20,7 +21,9 @@ return {
         {}
       end
       ]],
-      {i(0)}
+      {d(1, function(_, snip)
+        return sn(1, {i(1, snip.env.TM_SELECTED_TEXT[1] or "")})
+      end)}
     )
   ),
   
