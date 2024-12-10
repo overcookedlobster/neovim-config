@@ -69,7 +69,7 @@ use {
         anthropic = {
           api_key = os.getenv "ANTHROPIC_API_KEY",
         },
-        ollama = {},
+        -- ollama = {},
         xai = {
           api_key = os.getenv "XAI_API_KEY",
         },
