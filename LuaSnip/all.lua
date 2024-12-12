@@ -61,10 +61,10 @@ return
       {condition = line_begin_or_non_letter}
     ),
     -- Today's date in YYYY-MM-DD (ISO 8601) format
-    s({trig = "iso"},
-    {f(get_date)}
-    -- {f(get_ISO_8601_date)}
-    ),
+    -- s({trig = "iso"},
+    -- {f(get_date)}
+    -- -- {f(get_ISO_8601_date)}
+    -- ),
     -- Curly braces
     s({trig = "fds", snippetType="autosnippet"},
       fmta(

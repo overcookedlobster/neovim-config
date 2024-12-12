@@ -247,6 +247,8 @@ vim.keymap.set("v", "<C-p>r", ":<C-u>'<,'>PrtRewrite<cr>", keymapOptions("Visual
 vim.keymap.set("v", "<C-p>a", ":<C-u>'<,'>PrtAppend<cr>", keymapOptions("Visual Append (after)"))
 vim.keymap.set("v", "<C-p>b", ":<C-u>'<,'>PrtPrepend<cr>", keymapOptions("Visual Prepend (before)"))
 vim.keymap.set("v", "<C-p>i", ":<C-u>'<,'>PrtImplement<cr>", keymapOptions("Implement selection"))
+vim.keymap.set("v", "<C-p>e", ":<C-u>'<,'>PrtExplain ", keymapOptions("Explain selection"))
+vim.keymap.set("v", "<C-p>ee", ":<C-u>'<,'>PrtExplainWithContext ", keymapOptions("Explain selection with context"))
 
 -- Make Ranger replace Netrw and be the file explorer
 vim.g.rnvimr_enable_ex = 1
@@ -297,4 +299,4 @@ vim.keymap.set('n', '<S-TAB>', ':tabprev<CR>', { silent = true })
 vim.keymap.set('n', '<C-t>', ':tabnew<CR>', { silent = true })
 -- vim.keymap.set('n', '<C-x>', ':tabclose<CR>', { silent = true })
 vim.keymap.set('n', '<leader>m', ':MarkdownPreview<CR>', { silent = true })
-
+vim.api.nvim_set_keymap('t', '<Esc>' ,'<C-\\><C-n>', { noremap = true, silent = true })
