@@ -233,6 +233,8 @@ vim.api.nvim_set_keymap('n', '<leader>pr', ':PrtChatResponde<CR>', { noremap = t
 vim.api.nvim_set_keymap('n', '<leader>prr', ':PrtChatNew<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pp', ':PrtProvider<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pa', ':PrtAsk<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pf', ':PrtChatFinder<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pm', ':PrtModel<CR>', { noremap = true, silent = true })
 local function keymapOptions(desc)
     return {
         noremap = true,
@@ -293,6 +295,6 @@ vim.keymap.set("t", "<C-l>", "<cmd>wincmd l<CR>")
 vim.keymap.set('n', '<TAB>', ':tabnext<CR>', { silent = true })
 vim.keymap.set('n', '<S-TAB>', ':tabprev<CR>', { silent = true })
 vim.keymap.set('n', '<C-t>', ':tabnew<CR>', { silent = true })
-vim.keymap.set('n', '<C-x>', ':tabclose<CR>', { silent = true })
+-- vim.keymap.set('n', '<C-x>', ':tabclose<CR>', { silent = true })
 vim.keymap.set('n', '<leader>m', ':MarkdownPreview<CR>', { silent = true })
 
