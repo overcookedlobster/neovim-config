@@ -50,16 +50,16 @@ return
       ),
       {condition = line_begin_or_non_letter}
     ),
-    -- Paired single quotes
-    s({trig = "'", wordTrig = false, snippetType="autosnippet", priority=2000},
-      fmta(
-        "'<>'",
-        {
-          d(1, get_visual),
-        }
-      ),
-      {condition = line_begin_or_non_letter}
-    ),
+    -- -- Paired single quotes
+    -- s({trig = "'", wordTrig = false, snippetType="autosnippet", priority=2000},
+    --   fmta(
+    --     "'<>'",
+    --     {
+    --       d(1, get_visual),
+    --     }
+    --   ),
+    --   {condition = line_begin_or_non_letter}
+    -- ),
     -- Today's date in YYYY-MM-DD (ISO 8601) format
     -- s({trig = "iso"},
     -- {f(get_date)}

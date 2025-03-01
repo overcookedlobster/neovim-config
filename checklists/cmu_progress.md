@@ -3,9 +3,9 @@
 Page Offset: -6
 
 - [x] **Chapter 1: A Tour of Computer Systems** (Page 37)
-  - [ ] 1.1 Information Is Bits + Context (Page 39)
-  - [ ] 1.2 Programs Are Translated by Other Programs into Different Forms (Page 40)
-  - [ ] 1.3 It Pays to Understand How Compilation Systems Work (Page 42)
+  - [x] 1.1 Information Is Bits + Context (Page 39)
+  - [x] 1.2 Programs Are Translated by Other Programs into Different Forms (Page 40)
+  - [x] 1.3 It Pays to Understand How Compilation Systems Work (Page 42)
   - [ ] 1.4 Processors Read and Interpret Instructions Stored in Memory (Page 43)
   - [ ] 1.5 Caches Matter (Page 47)
   - [ ] 1.6 Storage Devices Form a Hierarchy (Page 50)

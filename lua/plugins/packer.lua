@@ -76,7 +76,27 @@ use {
         nvidia = {
           api_key = os.getenv "NVIDIA_API_KEY",
         },
+        deepseek = {
+          style = "openai",
+          api_key = os.getenv "DEEPSEEK_API_KEY",
+          endpoint = "https://api.deepseek.com/v1/chat/completions",
+          models = {
+            "deepseek-chat",      -- DeepSeek-V3
+            "deepseek-reasoner",  -- DeepSeek-R1
+          },
+          -- parameters to summarize chat
+          topic = {
+            model = "deepseek-chat",
+            -- params = { max_completion_tokens = 64 },
+          },
+          -- default parameters
+          params = {
+            chat = { temperature = 0.7, top_p = 1 },    -- using standard temperature
+            command = { temperature = 0.7, top_p = 1 },
+          },
+        }
       },
+      
       cmd_prefix = "Prt",
       chat_conceal_model_params = false,
       user_input_ui = "buffer",

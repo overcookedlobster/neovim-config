@@ -304,3 +304,20 @@ vim.keymap.set("t", "<C-h>", "<C-\\><C-n><C-w>h")
 vim.keymap.set("t", "<C-j>", "<C-\\><C-n><C-w>j")
 vim.keymap.set("t", "<C-k>", "<C-\\><C-n><C-w>k")
 -- vim.keymap.set("t", "<C-l>", "<C-\\><C-n><C-w>l")
+--
+
+vim.opt.clipboard = 'unnamedplus'
+
+-- Create an autocommand to apply the setting to all file types
+vim.api.nvim_create_autocmd("Filetype", {
+  pattern = "*", -- Apply to my shitstemverilog, 
+  callback = function()
+    -- remove 'c', 'r', and 'o' from formatoptions
+    vim.opt_local.formatoptions:remove({"c", "r", "o"})
+  end,
+}
+
+)
+
+-- Set the foreground and background color for the Comment group
+vim.api.nvim_set_hl(0, "Comment", { fg = "#5f87af", bg = "NONE"})

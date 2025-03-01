@@ -152,6 +152,9 @@ local function display_checklist(markdown_path)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'q', ':q<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>p', ':lua require("personal.checklist").open_pdf()<CR>', opts)
 
+    -- vim.api.nvim_create_user_command('ChecklistViewer', function()
+    --   require('personal.checklist').open_pdf()
+    -- end, {})
     -- Set filetype to markdown
     vim.api.nvim_buf_set_option(bufnr, 'filetype', 'markdown')
 
