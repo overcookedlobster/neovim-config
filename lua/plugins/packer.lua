@@ -76,6 +76,25 @@ use {
         nvidia = {
           api_key = os.getenv "NVIDIA_API_KEY",
         },
+        igpt = {
+          style = "openai",
+          api_key = os.getenv "INTEL_API_KEY",
+          endpoint = " https://apis-internal-sandbox.intel.com/v3/chat/completions",
+          models = {
+            "deepseek-chat",      -- DeepSeek-V3
+            "deepseek-reasoner",  -- DeepSeek-R1
+          },
+          -- parameters to summarize chat
+          topic = {
+            model = "deepseek-chat",
+            params = { max_completion_tokens = 64 },
+          },
+          -- default parameters
+          params = {
+            chat = { temperature = 0.7, top_p = 1 },    -- using standard temperature
+            command = { temperature = 0.7, top_p = 1 },
+          },
+        },
         deepseek = {
           style = "openai",
           api_key = os.getenv "DEEPSEEK_API_KEY",
@@ -87,7 +106,7 @@ use {
           -- parameters to summarize chat
           topic = {
             model = "deepseek-chat",
-            -- params = { max_completion_tokens = 64 },
+            params = { max_completion_tokens = 64 },
           },
           -- default parameters
           params = {

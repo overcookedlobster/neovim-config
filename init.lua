@@ -235,6 +235,9 @@ vim.api.nvim_set_keymap('n', '<leader>pp', ':PrtProvider<CR>', { noremap = true,
 vim.api.nvim_set_keymap('n', '<leader>pa', ':PrtAsk<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pf', ':PrtChatFinder<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pm', ':PrtModel<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pt', ':PrtThinking<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>ptt', ':PrtThinking ', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pts', ':PrtThinking status<CR>', { noremap = true, silent = true })
 local function keymapOptions(desc)
     return {
         noremap = true,
