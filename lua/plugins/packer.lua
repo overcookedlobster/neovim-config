@@ -119,7 +119,7 @@ use {
       cmd_prefix = "Prt",
       chat_conceal_model_params = false,
       user_input_ui = "buffer",
-      toggle_target = "tabnew",
+      toggle_target = "vsplit",
       online_model_selection = true,
       command_auto_select_response = true,
       -- Copy the rest of the opts table...

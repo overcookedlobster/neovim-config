@@ -324,3 +324,30 @@ vim.api.nvim_create_autocmd("Filetype", {
 
 -- Set the foreground and background color for the Comment group
 vim.api.nvim_set_hl(0, "Comment", { fg = "#5f87af", bg = "NONE"})
+
+
+-- Tab management keybindings
+local opts = { noremap = true, silent = true }
+
+-- Creating and closing tabs
+vim.keymap.set('n', '<Leader>tn', ':tabnew<CR>', opts)          -- "tab new"
+vim.keymap.set('n', '<Leader>tc', ':tabclose<CR>', opts)         -- "tab close"
+
+-- Navigation between tabs (frequent operations, so made simpler)
+vim.keymap.set('n', '<Leader>l', ':tabnext<CR>', opts)           -- Move right (next tab)
+vim.keymap.set('n', '<Leader>h', ':tabprevious<CR>', opts)       -- Move left (previous tab)
+
+-- Alternative tab navigation with Alt+h/l for users who prefer it
+vim.keymap.set('n', '<A-l>', ':tabnext<CR>', opts)
+vim.keymap.set('n', '<A-h>', ':tabprevious<CR>', opts)
+
+-- Move tabs (reordering)
+vim.keymap.set('n', '<Leader>tm', ':tabmove<Space>', { noremap = true })  -- "tab move" - needs number input
+
+-- Jump to specific tabs by number (1-9)
+for i = 1, 9 do
+  vim.keymap.set('n', '<Leader>' .. i, i .. 'gt', opts)
+end
+
+-- Open file in new tab
+vim.keymap.set('n', '<Leader>to', ':tabedit<Space>', { noremap = true })  -- "tab open" - prompts for filename
