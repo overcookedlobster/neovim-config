@@ -351,3 +351,27 @@ end
 
 -- Open file in new tab
 vim.keymap.set('n', '<Leader>to', ':tabedit<Space>', { noremap = true })  -- "tab open" - prompts for filename
+
+
+-- Buffer management keybindings
+
+-- Navigation between buffers (frequent operations)
+vim.keymap.set('n', '<A-j>', ':bnext<CR>', opts)             -- Next buffer (down in list)
+vim.keymap.set('n', '<A-k>', ':bprevious<CR>', opts)          -- Previous buffer (up in list)
+
+-- Alternative with Leader if you prefer
+vim.keymap.set('n', '<Leader>bn', ':bnext<CR>', opts)         -- "buffer next"
+vim.keymap.set('n', '<Leader>bp', ':bprevious<CR>', opts)     -- "buffer previous"
+
+-- Buffer operations
+vim.keymap.set('n', '<Leader>bd', ':bdelete<CR>', opts)       -- "buffer delete"
+vim.keymap.set('n', '<Leader>ba', ':badd<Space>', { noremap = true })  -- "buffer add" new file
+vim.keymap.set('n', '<Leader>bl', ':buffers<CR>', opts)       -- "buffer list"
+
+-- Quick buffer switching with Alt+number (direct access to first 9 buffers)
+for i = 1, 9 do
+  vim.keymap.set('n', '<A-' .. i .. '>', ':buffer ' .. i .. '<CR>', opts)
+end
+
+-- Quick save-and-close buffer shortcut
+vim.keymap.set('n', '<Leader>bw', ':write<CR>:bdelete<CR>', opts)  -- "buffer write" and close
